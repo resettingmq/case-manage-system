@@ -1,7 +1,14 @@
+import os
+
 from django.db import models
 from django.db.models.signals import post_save
+from django.db.utils import IntegrityError
 from django.contrib.auth.models import User
 from django.dispatch import receiver
+from django.utils import timezone
+from django.conf import settings
+
+BASE_DIR = settings.BASE_DIR
 
 # Create your models here.
 
@@ -35,3 +42,32 @@ def save_profile(sender, instance, created, **kwargs):
         Profile.objects.create(user=instance)
     else:
         instance.profile.save()
+
+
+class CommonFieldMixin(models.Model):
+    created_at = models.DateTimeField(default=timezone.now)
+    enabled = models.BooleanField(default=True)
+
+    class Meta:
+        abstract = True
+
+
+class Continent(CommonFieldMixin):
+    id = models.CharField(max_length=5, primary_key=True)
+    name_chs = models.CharField(max_length=20, db_index=True)
+    name_en = models.CharField(max_length=20, db_index=True)
+
+    data_path = os.path.join(BASE_DIR, 'data/continent.json')
+
+    def __str__(self):
+        return '{c.id}-{c.name_chs}'.format(c=self)
+
+    @classmethod
+    def populate(cls):
+        import json
+        continents = json.load(open(cls.data_path))
+        for c in continents:
+            try:
+                cls.objects.create(**c)
+            except IntegrityError:
+                pass
