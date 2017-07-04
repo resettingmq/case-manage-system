@@ -71,3 +71,35 @@ class Continent(CommonFieldMixin):
                 cls.objects.create(**c)
             except IntegrityError:
                 pass
+
+
+class Country(CommonFieldMixin):
+    id = models.CharField(max_length=2, primary_key=True)
+    name_chs = models.CharField(max_length=50, null=True, blank=True)
+    name_en_short = models.CharField(max_length=50)
+    name_en_long = models.CharField(max_length=100, null=True, blank=True)
+    calling_code = models.CharField(max_length=50)
+    iso_code = models.CharField(max_length=5)
+    is_eu = models.BooleanField(default=False)
+    is_madrid = models.BooleanField(default=False)
+    is_oapi = models.BooleanField(default=False)
+
+    continent = models.ForeignKey(Continent, null=True, blank=True)
+
+    data_path = os.path.join(BASE_DIR, 'data/country.json')
+
+    class Meta:
+        verbose_name_plural = 'countries'
+
+    def __str__(self):
+        return '{c.id}-{c.name_en_short}-{c.name_chs}'.format(c=self)
+
+    @classmethod
+    def populate(cls):
+        import json
+        countries = json.load(open(cls.data_path))
+        for c in countries:
+            try:
+                cls.objects.create(**c)
+            except IntegrityError:
+                pass
