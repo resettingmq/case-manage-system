@@ -103,3 +103,25 @@ class Country(CommonFieldMixin):
                 cls.objects.create(**c)
             except IntegrityError:
                 pass
+
+
+class Currency(CommonFieldMixin):
+    id = models.CharField(max_length=5, primary_key=True)
+    name_chs = models.CharField(max_length=50)
+    name_en = models.CharField(max_length=50)
+    symbol = models.CharField(max_length=5, null=True, blank=True)
+
+    data_path = os.path.join(BASE_DIR, 'data/currency.json')
+
+    class Meta:
+        verbose_name_plural = 'currencies'
+
+    @classmethod
+    def populate(cls):
+        import json
+        currencies = json.load(open(cls.data_path))
+        for c in currencies:
+            try:
+                cls.objects.create(**c)
+            except IntegrityError:
+                pass
