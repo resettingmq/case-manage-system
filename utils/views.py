@@ -33,6 +33,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
     : 这个Mixin不应该被单独使用，它依赖与定义了get_queryset()的类
     """
     dt_data_src = 'data'
+    dt_config = None
     dt_column_fields = None
 
     def get_dt_data_src(self):
@@ -43,15 +44,16 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         : 生成DataTables实例所期望的model field names集合
         :return: list, model field names 列表
         """
-        if self.dt_column_fields is not None:
-            return self.dt_column_fields
-        try:
-            model = self.get_queryset().model
-            dt_column_fields = model.DataTablesMeta.column_fields.keys()
-        except AttributeError:
-            return []
-        else:
-            return dt_column_fields
+        # if self.dt_column_fields is not None:
+        #     return self.dt_column_fields
+        # try:
+        #     model = self.get_queryset().model
+        #     dt_column_fields = model.DataTablesMeta.column_fields.keys()
+        # except AttributeError:
+        #     return []
+        # else:
+        #     return dt_column_fields
+        return self.dt_config.get_field_names()
 
 
 class DataTablesListView(DataTablesMixin, generic.ListView):
