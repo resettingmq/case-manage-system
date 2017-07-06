@@ -337,10 +337,7 @@
 <!--
 <script src="{% static 'js/vendor/AdminLTE/demo.js' %}"></script>
 -->
-<script type="text/javascript">
-    $(document).ready(function(){
-        $('.table').dataTable();
-    });
-</script>
+{% block javascript %}
+{% endblock javascript %}
 </body>
 </html>
