@@ -15,6 +15,8 @@ class ClientDataTable(ModelDataTable):
 
     class Meta:
         model = models.Client
+        fields = ['is_agent']
+        column_order = ['country__continent__name_chs', 'name', 'is_agent', 'country__name_chs']
 
 
 def index(request):

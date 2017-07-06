@@ -23,7 +23,15 @@ def _get_field(model, field_name):
 
 
 class DataTablesColumn:
-    pass
+    def __init__(self, title=None, field=None):
+        self.title = title
+        self._field = field
+
+    @classmethod
+    def get_instance_from_field(cls, field):
+        dt_column = cls(field=field)
+        dt_column.title = field.verbose_name
+        return dt_column
 
 
 class ModelDataTableMetaClass(type):
@@ -53,8 +61,33 @@ class ModelDataTableMetaClass(type):
                 d.pop(name)
         del attrs
 
-        d['declared_columns'] = declared_columns
-        print("I'm here")
+        d['_declared_columns'] = OrderedDict(declared_columns)
+
+        meta_defined_columns = []
+        field_names = getattr(meta, 'fields', [])
+        for field_name in field_names:
+            filed = _get_field(model, field_name)
+            if field is None:
+                continue
+            dt_column = DataTablesColumn.get_instance_from_field(field)
+            meta_defined_columns.append((field_name, dt_column))
+        d['_meta_defined_columns'] = OrderedDict(meta_defined_columns)
+
+        column_order = getattr(meta, 'column_order', None)
+        if column_order is None:
+            columns = OrderedDict(declared_columns)
+            for name, column in d['_meta_defined_columns'].items():
+                if name not in columns:
+                    columns[name] = column
+        else:
+            columns = OrderedDict()
+            for name in column_order:
+                if name in d['_declared_columns']:
+                    columns[name] = d['_declared_columns'][name]
+                elif name in d['_meta_defined_columns']:
+                    columns[name] = d['_meta_defined_columns'][name]
+        d['columns'] = columns
+
         return super().__new__(mcls, name, bases, d)
 
     @classmethod
@@ -65,4 +98,4 @@ class ModelDataTableMetaClass(type):
 class ModelDataTable(metaclass=ModelDataTableMetaClass):
     @classmethod
     def get_field_names(cls):
-        return [column[0] for column in cls.declared_columns]
+        return cls.columns.keys()
