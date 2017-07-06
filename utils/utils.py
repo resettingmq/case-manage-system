@@ -3,6 +3,7 @@
 from collections import OrderedDict
 from django.core.exceptions import ImproperlyConfigured, FieldDoesNotExist
 from django.db.models.base import ModelBase
+from django.db.models.fields import Field
 
 
 def _get_field(model, field_name):
@@ -25,12 +26,30 @@ def _get_field(model, field_name):
 class DataTablesColumn:
     def __init__(self, title=None, field=None):
         self.title = title
+        if field is not None:
+            self._initialize_from_field(field)
+        else:
+            self._bound = False
+
+    @property
+    def field(self):
+        raise AttributeError('Attribute field not defined, try _field')
+
+    @field.setter
+    def field(self, value):
+        self._initialize_from_field(value)
+
+    def _initialize_from_field(self, field):
+        if not isinstance(field, Field):
+            raise ValueError('Not an instance of django Field')
+        if self.title is None:
+            self.title = field.verbose_name
         self._field = field
+        self._bound = True
 
     @classmethod
     def get_instance_from_field(cls, field):
         dt_column = cls(field=field)
-        dt_column.title = field.verbose_name
         return dt_column
 
 
@@ -57,7 +76,7 @@ class ModelDataTableMetaClass(type):
                 field = _get_field(model, name)
                 if field is None:
                     continue
-                value._field = field
+                value.field = field
                 declared_columns.append((name, value))
                 d.pop(name)
         d['_declared_columns'] = OrderedDict(declared_columns)
