@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">客户列表</h3>
+                </div>
+                <div class="box-body">
+                    <table id="model-list" class="table table-bordered table-hover">
+                        <thead>
+                            <tr>
+                                <th>客户名</th>
+                                <th>代理?</th>
+                                <th>国家</th>
+                                <th>货币</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for client in client_list %}
+                            <tr>
+                                <td>{{ client.name }}</td>
+                                <td>{{ client.is_agent }}</td>
+                                <td>{{ client.country.name_chs }}</td>
+                                <td>{{ client.currency.name_chs }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
