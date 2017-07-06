@@ -49,6 +49,7 @@ class ModelDataTableMetaClass(type):
         if not isinstance(model, ModelBase):
             raise ImproperlyConfigured('The model specified in Meta is not a models.Model instance.')
 
+        # 处理声明式定义的columns
         d = dict(attrs)
         declared_columns = []
         for name, value in attrs.items():
@@ -59,20 +60,22 @@ class ModelDataTableMetaClass(type):
                 value._field = field
                 declared_columns.append((name, value))
                 d.pop(name)
+        d['_declared_columns'] = OrderedDict(declared_columns)
         del attrs
 
-        d['_declared_columns'] = OrderedDict(declared_columns)
-
+        # 处理从Meta class属性中读取fields-columns的信息
+        # todo: 实现从Fields中读取更多的配置信息，这里之实现了读取field_name
         meta_defined_columns = []
         field_names = getattr(meta, 'fields', [])
         for field_name in field_names:
-            filed = _get_field(model, field_name)
+            field = _get_field(model, field_name)
             if field is None:
                 continue
             dt_column = DataTablesColumn.get_instance_from_field(field)
             meta_defined_columns.append((field_name, dt_column))
         d['_meta_defined_columns'] = OrderedDict(meta_defined_columns)
 
+        # 处理两种columns源的order，并生成最终的columns属性
         column_order = getattr(meta, 'column_order', None)
         if column_order is None:
             columns = OrderedDict(declared_columns)
@@ -98,4 +101,16 @@ class ModelDataTableMetaClass(type):
 class ModelDataTable(metaclass=ModelDataTableMetaClass):
     @classmethod
     def get_field_names(cls):
+        """
+        : 指定json数据中包含的fields
+        :return: list，json数据中应该包含的fields
+        """
         return cls.columns.keys()
+
+    @classmethod
+    def get_titles(cls):
+        """
+        : 返回用于HTML table header显示的列名
+        :return: list
+        """
+        return [column.title for column in cls.columns.values()]
