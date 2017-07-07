@@ -25,9 +25,10 @@ def _get_field(model, field_name):
 
 
 class DataTablesColumn:
-    def __init__(self, title=None, searchable=True, field=None):
+    def __init__(self, title=None, searchable=True, orderable=True, field=None):
         self.title = title
         self.searchable = searchable
+        self.orderable = orderable
         if field is not None:
             self._initialize_from_field(field)
         else:
@@ -50,10 +51,11 @@ class DataTablesColumn:
         self._bound = True
 
     def get_dt_column_config(self):
-        dt_config = {}
-        dt_config.update(data=self.name)
-        dt_config.update(searchable=self.searchable)
-        return dt_config
+        dt__column_config = {}
+        dt__column_config.update(data=self.name)
+        dt__column_config.update(searchable=self.searchable)
+        dt__column_config.update(orderable=self.orderable)
+        return dt__column_config
 
     def get_filter_q_object(self, pattern, is_regex):
         """

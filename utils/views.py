@@ -95,6 +95,9 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
             )
 
             # 处理order
+            order_dir = '' if http_queryset['order[0][dir]'] == 'asc' else '-'
+            order_column = list(self.dt_config.columns.values())[int(http_queryset['order[0][column]'])].name
+            queryset = queryset.order_by(order_dir + order_column)
 
         json_context = {
             self.dt_data_src: list(queryset.values(*dt_column_fields))
