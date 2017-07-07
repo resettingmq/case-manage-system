@@ -68,6 +68,17 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         #     return dt_column_fields
         return self.dt_config.get_field_names()
 
+    def get_json_context_data(self):
+        """
+        : 依赖于其他class的get_queryset()方法
+        :return: dict
+        """
+        dt_column_fields = self.get_dt_column_fields()
+        json_context = {
+            self.dt_data_src: list(self.get_queryset().values(*dt_column_fields))
+        }
+        return super().get_json_context_data(**json_context)
+
     def get_context_data(self, dt_config=None, **kwargs):
         """
         : 将ModelDataTables类添加进context
@@ -80,21 +91,15 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         datatables_id = datatables_config.table_id
         kwargs.update(
             dt_config=datatables_config,
-            dt_id = datatables_id
+            dt_id=datatables_id
         )
         return super().get_context_data(**kwargs)
 
 
 class DataTablesListView(DataTablesMixin, generic.ListView):
 
-    def get_json_context_data(self):
-        dt_column_fields = self.get_dt_column_fields()
-        json_context = {
-            self.dt_data_src: list(self.get_queryset().values(*dt_column_fields))
-        }
-        return super(DataTablesListView, self).get_json_context_data(**json_context)
-
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
-            return self.render_to_json_response(self.get_json_context_data())
+            # if not self.dt_config.dt_serverSide:
+                return self.render_to_json_response(self.get_json_context_data())
         return super().get(request, *args, **kwargs)
