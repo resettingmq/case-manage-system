@@ -49,9 +49,10 @@ class DataTablesColumn:
         self._field = field
         self._bound = True
 
-    def get_dt_config(self):
+    def get_dt_column_config(self):
         dt_config = {}
-        dt_config['data'] = self.name
+        dt_config.update(data=self.name)
+        dt_config.update(searchable=self.searchable)
         return dt_config
 
     def get_filter_q_object(self, pattern, is_regex):
@@ -172,7 +173,7 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
         用于生成DataTables cloumns相关的配置属性
         :return: list，每个元素代表一个column的配置
         """
-        return [c.get_dt_config() for c in cls.columns.values()]
+        return [c.get_dt_column_config() for c in cls.columns.values()]
 
     @classmethod
     def get_dt_config(cls):
