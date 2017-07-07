@@ -47,6 +47,11 @@ class DataTablesColumn:
         self._field = field
         self._bound = True
 
+    def get_dt_config(self):
+        dt_config = {}
+        dt_config['data'] = self.name
+        return dt_config
+
     @classmethod
     def get_instance_from_field(cls, field):
         dt_column = cls(field=field)
@@ -76,11 +81,11 @@ class ModelDataTableMetaClass(type):
                 field = _get_field(model, name)
                 if field is None:
                     continue
+                value.name = name
                 value.field = field
                 declared_columns.append((name, value))
                 d.pop(name)
         d['_declared_columns'] = OrderedDict(declared_columns)
-        del attrs
 
         # 处理从Meta class属性中读取fields-columns的信息
         # todo: 实现从Fields中读取更多的配置信息，这里之实现了读取field_name
@@ -91,6 +96,7 @@ class ModelDataTableMetaClass(type):
             if field is None:
                 continue
             dt_column = DataTablesColumn.get_instance_from_field(field)
+            dt_column.name = field_name
             meta_defined_columns.append((field_name, dt_column))
         d['_meta_defined_columns'] = OrderedDict(meta_defined_columns)
 
@@ -110,6 +116,16 @@ class ModelDataTableMetaClass(type):
                     columns[name] = d['_meta_defined_columns'][name]
         d['columns'] = columns
 
+        # 处理js配置属性，dt_开头的类属性
+        js_config = {}
+        for name, value in attrs.items():
+            if name.startswith('dt_'):
+                attr_name = name.split('dt_', 1)[1]
+                js_config[attr_name] = value
+        d['js_config'] = js_config
+
+        d['table_id'] = 'dt-{}'.format(model._meta.model_name)
+
         return super().__new__(mcls, name, bases, d)
 
     @classmethod
@@ -121,7 +137,7 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
     @classmethod
     def get_field_names(cls):
         """
-        : 指定json数据中包含的fields
+        : 指定json数据中包含的fields，用于对请求的处理函数中
         :return: list，json数据中应该包含的fields
         """
         return cls.columns.keys()
@@ -133,3 +149,21 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
         :return: list
         """
         return [column.title for column in cls.columns.values()]
+
+    @classmethod
+    def get_dt_config_columns(cls):
+        """
+        用于生成DataTables cloumns相关的配置属性
+        :return: list，每个元素代表一个column的配置
+        """
+        return [c.get_dt_config() for c in cls.columns.values()]
+
+    @classmethod
+    def get_dt_config(cls):
+        """
+        用于生成DataTables相关的配置属性
+        :return: dict，每个key指向一个配置项
+        """
+        config = dict(cls.js_config)
+        config['columns'] = cls.get_dt_config_columns()
+        return config

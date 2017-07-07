@@ -13,6 +13,9 @@ class ClientDataTable(ModelDataTable):
     country__name_chs = DataTablesColumn()
     country__continent__name_chs = DataTablesColumn()
 
+    dt_serverSide = True
+    dt_processing = True
+
     class Meta:
         model = models.Client
         fields = ['is_agent']

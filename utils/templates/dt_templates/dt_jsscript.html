@@ -1,0 +1,6 @@
+{% load datatables_widget %}
+<script type="text/javascript">
+    $(document).ready(function(){
+       $("#{{ table_id }}").dataTable({{ dt_config|json }});
+    });
+</script>
