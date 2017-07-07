@@ -1,7 +1,8 @@
-from django.shortcuts import render
+from functools import reduce
 from django.views import generic
 from django.http import JsonResponse
 from django.core.exceptions import ImproperlyConfigured
+from django.db.models import Q
 
 # Create your views here.
 
@@ -52,6 +53,9 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         dt_config = self.get_dt_config()
         return self.dt_config.table_id
 
+    def is_server_side(self):
+        return bool(self.dt_config.dt_serverSide)
+
     def get_dt_column_fields(self):
         """
         : 生成DataTables实例所期望的model field names集合
@@ -68,14 +72,32 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         #     return dt_column_fields
         return self.dt_config.get_field_names()
 
-    def get_json_context_data(self):
+    def get_json_context_data(self, http_queryset=None):
         """
         : 依赖于其他class的get_queryset()方法
         :return: dict
         """
         dt_column_fields = self.get_dt_column_fields()
+        queryset = self.get_queryset()
+        if self.is_server_side():
+            if http_queryset is None:
+                raise ValueError('No GET queryset passed in for server-side mode')
+            # 处理filter
+            # 只实现了对全局的搜索
+            # 没有实现对指定列的搜索
+            pattern = http_queryset.get('search[value]')
+            is_regex = http_queryset.get('search[regex]') == 'true'
+            queryset = queryset.filter(
+                reduce(
+                    lambda x, y: x | y,
+                    [c.get_filter_q_object(pattern, is_regex) for c in self.dt_config.columns.values()]
+                )
+            )
+
+            # 处理order
+
         json_context = {
-            self.dt_data_src: list(self.get_queryset().values(*dt_column_fields))
+            self.dt_data_src: list(queryset.values(*dt_column_fields))
         }
         return super().get_json_context_data(**json_context)
 
@@ -101,5 +123,5 @@ class DataTablesListView(DataTablesMixin, generic.ListView):
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             # if not self.dt_config.dt_serverSide:
-                return self.render_to_json_response(self.get_json_context_data())
+                return self.render_to_json_response(self.get_json_context_data(request.GET))
         return super().get(request, *args, **kwargs)

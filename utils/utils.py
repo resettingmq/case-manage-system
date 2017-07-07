@@ -4,6 +4,7 @@ from collections import OrderedDict
 from django.core.exceptions import ImproperlyConfigured, FieldDoesNotExist
 from django.db.models.base import ModelBase
 from django.db.models.fields import Field
+from django.db.models import Q
 
 
 def _get_field(model, field_name):
@@ -24,8 +25,9 @@ def _get_field(model, field_name):
 
 
 class DataTablesColumn:
-    def __init__(self, title=None, field=None):
+    def __init__(self, title=None, searchable=True, field=None):
         self.title = title
+        self.searchable = searchable
         if field is not None:
             self._initialize_from_field(field)
         else:
@@ -51,6 +53,20 @@ class DataTablesColumn:
         dt_config = {}
         dt_config['data'] = self.name
         return dt_config
+
+    def get_filter_q_object(self, pattern, is_regex):
+        """
+        : 产生filter用的Q对象，在DataTabelsMixin中处理请求中filter相关功能时使用
+        :param pattern: 
+        :param is_regex: 
+        :return: django.db.models.Q对象
+        """
+        if not self.searchable:
+            # 不能返回None, Q对象不能跟None进行OR操作
+            return Q()
+        lookup_str = '__iregex' if is_regex else '__icontains'
+        lookup_str = self.name + lookup_str
+        return Q(**{lookup_str: pattern})
 
     @classmethod
     def get_instance_from_field(cls, field):
