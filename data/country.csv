@@ -1,0 +1,240 @@
+id,name_chs,name_en_short,name_en_long,calling_code,iso_code,is_eu,is_madrid,is_oapi,continent_id
+AF,阿富汗,Afghanistan,Islamic Republic of Afghanistan,93,AFG,0,0,0,AS
+AL,阿尔巴尼亚,Albania,Republic of Albania,355,ALB,0,1,0,EU
+DZ,阿尔及利亚,Algeria,People's Democratic Republic of Algeria,213,DZA,0,1,0,AF
+AS,美属萨摩亚,American Samoa,,1-684,ASM,0,0,0,
+AD,安道尔,Andorra,Principality of Andorra,376,AND,0,0,0,
+AO,安哥拉,Angola,Republic of Angola,244,AGO,0,0,0,
+AI,安圭拉,Anguilla,,1-264,AIA,0,0,0,
+AQ,南极洲,Antarctica,,672,ATA,0,0,0,OC
+AG,安提瓜和巴布达,Antigua and Barbuda,Antiqua and Barbuda,1-268,ATG,0,1,0,SA
+AR,阿根廷,Argentina,Argentine Republic,54,ARG,0,0,0,SA
+AM,亚美尼亚,Armenia,Republic of Armenia,374,ARM,0,1,0,AS
+AW,阿鲁巴,Aruba,,297,ABW,0,0,0,
+AU,澳大利亚,Australia,Commonwealth of Australia,61,AUS,0,1,0,OC
+AT,奥地利,Austria,Republic of Austria,43,AUT,1,1,0,EU
+AZ,阿塞拜疆,Azerbaijan,Republic of Azerbaijan,994,AZE,0,1,0,AS
+BS,巴哈马,Bahamas,Commonwealth of The Bahamas,1-242,BHS,0,0,0,NA
+BH,巴林,Bahrain,Kingdom of Bahrain,973,BHR,0,1,0,AS
+BD,孟加拉国,Bangladesh,People's Republic of Bangladesh,880,BGD,0,0,0,AS
+BB,巴巴多斯,Barbados,Barbados,1-246,BRB,0,0,0,
+BY,白俄罗斯,Belarus,Republic of Belarus,375,BLR,0,1,0,EU
+BE,比利时,Belgium,Kingdom of Belgium,32,BEL,1,1,0,EU
+BZ,伯利兹,Belize,Belize,501,BLZ,0,0,0,
+BJ,贝宁,Benin,Republic of Benin,229,BEN,0,0,1,AF
+BM,百慕大,Bermuda,,1-441,BMU,0,0,0,
+BT,不丹,Bhutan,Kingdom of Bhutan,975,BTN,0,1,0,AS
+BO,玻利维亚,Bolivia,Plurinational State of Bolivia,591,BOL,0,0,0,SA
+BA,波斯尼亚和黑塞哥维那,Bosnia and Herzegovina ,Bosnia and Herzegovina,387,BIH,0,1,0,EU
+BW,博茨瓦纳,Botswana,Republic of Botswana,267,BWA,0,1,0,AF
+BR,巴西,Brazil,Federative Republic of Brazil,55,BRA,0,0,0,SA
+IO,大英印度洋领地,British Indian Ocean Territory,,246,IOT,0,0,0,AS
+VG,英属维尔京群岛,British Virgin Islands,,1-284,VGB,0,0,0,
+BN,文莱,Brunei,Brunei Darussalam,673,BRN,0,0,0,AS
+BG,保加利亚,Bulgaria,Republic of Bulgaria,359,BGR,1,1,0,EU
+BF,布基纳法索,Burkina Faso,Burkina Faso,226,BFA,0,0,1,AF
+MM,缅甸,Burma (Myanmar),Union of Burma,95,MMR,0,0,0,AS
+BI,布隆迪,Burundi,Republic of Burundi,257,BDI,0,0,0,
+CV,佛得角共和国,Capo Verde,Republic of Cabo Verde,238,CPV,0,0,0,AF
+KH,柬埔寨,Cambodia,Kingdom of Cambodia,855,KHM,0,1,0,AS
+CM,喀麦隆,Cameroon,Republic of Cameroon,237,CMR,0,0,1,AF
+CA,加拿大,Canada,Canada,1,CAN,0,0,0,NA
+KY,开曼群岛,Cayman Islands,,1-345,CYM,0,0,0,
+CF,中非共和国,Central African Republic,Central African Republic,236,CAF,0,0,1,AF
+TD,乍得,Chad,Republic of Chad,235,TCD,0,0,1,AF
+CL,智利,Chile,Republic of Chile,56,CHL,0,0,0,SA
+CN,中国,China,People's Republic of China,86,CHN,0,1,0,AS
+CX,圣诞岛,Christmas Island,,61,CXR,0,0,0,OC
+CC,科科斯（基林）群岛,Cocos Islands,,61,CCK,0,0,0,OC
+CO,哥伦比亚,Colombia,Republic of Colombia,57,COL,0,1,0,SA
+KM,科摩罗,Comoros,Union of the Comoros,269,COM,0,0,1,AF
+CG,刚果共和国,Congo (Brazzaville) ,Republic of the Congo,242,COG,0,0,1,AF
+CD,刚果（金）,Congo (Kinshasa) ,Democratic Republic of the Congo,243,COD,0,0,0,AF
+CK,库克群岛,Cook Islands,,682,COK,0,0,0,
+CR,哥斯达黎加,Costa Rica,Republic of Costa Rica,506,CRI,0,0,0,
+CI,科特迪瓦,Côte d'Ivoire (Ivory Coast),Republic of Côte d'Ivoire,225,CIV,0,0,1,AF
+HR,克罗地亚,Croatia,Republic of Croatia,385,HRV,1,1,0,EU
+CU,古巴,Cuba,Republic of Cuba,53,CUB,0,1,0,NA
+CW,库拉索,Curacao,,599,CUW,0,0,0,
+CY,塞浦路斯,Cyprus,Republic of Cyprus,357,CYP,1,1,0,EU
+CZ,捷克,Czech Republic,Czech Republic,420,CZE,1,1,0,EU
+DK,丹麦,Denmark,Kingdom of Denmark,45,DNK,1,1,0,EU
+DJ,吉布提,Djibouti,Republic of Djibouti,253,DJI,0,0,0,AF
+DM,多米尼克,Dominica,Commonwealth of Dominica,1-767,DMA,0,0,0,SA
+DO,多米尼加共和国,Dominican Republic,Dominican Republic,"1-809, 1-829, 1-849",DOM,0,0,0,SA
+EC,厄瓜多尔,Ecuador,Republic of Ecuador,593,ECU,0,0,0,SA
+EG,埃及,Egypt,Arab Republic of Egypt,20,EGY,0,1,0,AF
+SV,萨尔瓦多,El Salvador,Republic of El Salvador,503,SLV,0,0,0,
+GQ,赤道几内亚,Equatorial Guinea,Republic of Equatorial Guinea,240,GNQ,0,0,1,AF
+ER,厄立特里亚,Eritrea,State of Eritrea,291,ERI,0,0,0,AF
+EE,爱沙尼亚,Estonia,Republic of Estonia,372,EST,1,1,0,EU
+ET,埃塞俄比亚,Ethiopia,Federal Democratic Republic of Ethiopia,251,ETH,0,0,0,AF
+FK,福克兰群岛,Falkland Islands,,500,FLK,0,0,0,
+FO,法罗群岛,Faroe Islands,,298,FRO,0,0,0,
+FJ,斐济,Fiji,Republic of Fiji,679,FJI,0,0,0,
+FI,芬兰,Finland,Republic of Finland,358,FIN,1,1,0,EU
+FR,法国,France,French Republic,33,FRA,1,1,0,EU
+PF,法属玻里尼西亚,French Polynesia,,689,PYF,0,0,0,OC
+GA,加蓬,Gabon,Gabonese Republic,241,GAB,0,0,1,AF
+GM,冈比亚,"Gambia, The",Republic of The Gambia,220,GMB,0,1,0,AF
+GE,格鲁吉亚,Georgia,Georgia,995,GEO,0,1,0,EU
+DE,德国,Germany,Federal Republic of Germany,49,DEU,1,1,0,EU
+GH,加纳,Ghana,Republic of Ghana,233,GHA,0,1,0,AF
+GI,直布罗陀,Gibraltar,,350,GIB,0,0,0,AF
+GR,希腊,Greece,Hellenic Republic,30,GRC,1,1,0,EU
+GL,格陵兰,Greenland,,299,GRL,0,0,0,NA
+GD,格林纳达,Grenada,Grenada,1-473,GRD,0,0,0,
+GU,关岛,Guam,,1-671,GUM,0,0,0,
+GT,危地马拉,Guatemala,Republic of Guatemala,502,GTM,0,0,0,
+GG,格恩西岛,Guernsey,,44-1481,GGY,0,0,0,
+GN,几内亚,Guinea,Republic of Guinea,224,GIN,0,0,1,AF
+GW,几内亚比绍,Guinea-Bissau,Republic of Guinea-Bissau,245,GNB,0,0,1,AF
+GY,圭亚那,Guyana,Co-operative Republic of Guyana,592,GUY,0,0,0,SA
+HT,海地,Haiti,Republic of Haiti,509,HTI,0,0,0,
+VA,罗马教廷（梵蒂冈）,Holy See,Holy See,379,VAT,0,0,0,EU
+HN,洪都拉斯,Honduras,Republic of Honduras,504,HND,0,0,0,NA
+HK,香港,Hong Kong,,852,HKG,0,0,0,AS
+HU,匈牙利,Hungary,Hungary,36,HUN,1,1,0,EU
+IS,冰岛,Iceland,Republic of Iceland,354,ISL,0,1,0,EU
+IN,印度,India,Republic of India,91,IND,0,1,0,AS
+ID,印度尼西亚,Indonesia,Republic of Indonesia,63,IDN,0,0,0,AS
+IR,伊朗,Iran,Islamic Republic of Iran,98,IRN,0,1,0,AS
+IQ,伊拉克,Iraq,Republic of Iraq,964,IRQ,0,0,0,AS
+IE,爱尔兰,Ireland,Ireland,353,IRL,1,1,0,EU
+IM,英国属地曼岛,Isle of Man,,44-1624,IMN,0,0,0,EU
+IL,以色列,Israel,State of Israel,972,ISR,0,1,0,AS
+IT,意大利,Italy,Italian Republic,39,ITA,1,1,0,EU
+JM,牙买加,Jamaica,Jamaica,1-876,JAM,0,0,0,NA
+JP,日本,Japan,Japan,81,JPN,0,1,0,AS
+JE,泽西,Jersey,,44-1534,JEY,0,0,0,
+JO,约旦,Jordan,Hashemite Kingdom of Jordan,962,JOR,0,0,0,AS
+KZ,哈萨克斯坦,Kazakhstan,Republic of Kazakhstan,7,KAZ,0,1,0,AS
+KE,肯尼亚,Kenya,Republic of Kenya,254,KEN,0,1,0,AF
+KI,基里巴斯,Kiribati,Republic of Kiribati,686,KIR,0,0,0,
+KP,朝鲜,"Korea, North",Democratic People's Republic of Korea,850,PRK,0,1,0,AS
+KR,韩国,"Korea, South",Republic of Korea,82,KOR,0,1,0,AS
+XK,科索沃,Kosovo,Republic of Kosovo,383,XKX,0,0,0,
+KW,科威特,Kuwait,State of Kuwait,965,KWT,0,0,0,AS
+KG,吉尔吉斯斯坦,Kyrgyzstan,Kyrgyz Republic,996,KGZ,0,1,0,AS
+LA,老挝,Laos,Lao People's Democratic Republic,856,LAO,0,0,0,AS
+LV,拉脱维亚,Latvia,Republic of Latvia,371,LVA,1,1,0,EU
+LB,黎巴嫩,Lebanon,Lebanese Republic,961,LBN,0,0,0,AS
+LS,莱索托,Lesotho,Kingdom of Lesotho,266,LSO,0,1,0,AF
+LR,利比里亚,Liberia,Republic of Liberia,231,LRB,0,1,0,AF
+LY,利比亚,Libya,Libya,218,LBY,0,0,0,AF
+LI,列支敦士登,Liechtenstein,Principality of Liechtenstein,423,LIE,0,1,0,EU
+LT,立陶宛,Lithuania,Republic of Lithuania,370,LTU,1,1,0,EU
+LU,卢森堡,Luxembourg,Grand Duchy of Luxembourg,352,LUX,1,1,0,EU
+MO,澳门,Macao,,853,MAC,0,0,0,AS
+MK,马其顿,Macedonia,Republic of Macedonia,389,MKD,0,1,0,EU
+MG,马达加斯加,Madagascar,Republic of Madagascar,261,MDG,0,1,0,AF
+MW,马拉维,Malawi,Republic of Malawi,265,MWI,0,0,0,AF
+MY,马来西亚,Malaysia,Malaysia,60,MYS,0,0,0,AS
+MV,马尔代夫,Maldives,Republic of Maldives,960,MDV,0,0,0,AS
+ML,马里,Mali,Republic of Mali,223,MLI,0,0,1,AF
+MT,马耳他,Malta,Republic of Malta,356,MLT,1,0,0,EU
+MH,马绍尔群岛,Marshall Islands,Republic of the Marshall Islands,692,MHL,0,0,0,
+MR,毛里塔尼亚,Mauritania,Islamic Republic of Mauritania,222,MRT,0,0,1,AF
+MU,毛里求斯,Mauritius,Republic of Mauritius,230,MUS,0,0,0,
+YT,马约特岛,Mayotte,,262,MYT,0,0,0,
+MX,墨西哥,Mexico,United Mexican States,52,MEX,0,1,0,NA
+FM,密克罗尼西亚联邦,"Micronesia, Federated States of",Federated States of Micronesia,691,FSM,0,0,0,
+MD,摩尔多瓦,Moldova,Republic of Moldova,373,MDA,0,1,0,EU
+MC,摩纳哥,Monaco,Principality of Monaco,377,MCO,0,1,0,EU
+MN,蒙古,Mongolia,Mongolia,976,MNG,0,1,0,AS
+ME,黑山共和国,Montenegro,Montenegro,382,MNE,0,1,0,EU
+MS,蒙特色拉特岛,Montserrat,,1-664,MSR,0,0,0,
+MA,摩洛哥,Morocco,Kingdom of Morocco,212,MAR,0,1,0,AF
+MZ,莫桑比克,Mozambique,Republic of Mozambique,258,MOZ,0,1,0,AF
+NA,纳米比亚,Namibia,Republic of Namibia,264,NAM,0,1,0,AF
+NR,瑙鲁,Nauru,Republic of Nauru,674,NRU,0,0,0,OC
+NP,尼泊尔,Nepal,Federal Democratic Republic of Nepal,977,NPL,0,0,0,AS
+NL,荷兰,Netherlands,Kingdom of the Netherlands,31,NLD,1,1,0,EU
+AN,荷属安的列斯群岛,Netherlands Antilles,,599,ANT,0,0,0,NA
+NC,新喀里多尼亚,New Caledonia,,687,NCL,0,0,0,OC
+NZ,新西兰,New Zealand,New Zealand,64,NZL,0,1,0,OC
+NI,尼加拉瓜,Nicaragua,Republic of Nicaragua,505,NIC,0,0,0,NA
+NE,尼日尔,Niger,Republic of Niger,227,NER,0,0,1,AF
+NG,尼日利亚,Nigeria,Federal Republic of Nigeria,234,NGA,0,0,0,AF
+NU,纽埃岛,Niue,,683,NIU,0,0,0,OC
+MP,北马里亚纳群岛,Northern Mariana Islands,,1-670,MNP,0,0,0,AS
+NO,挪威,Norway,Kingdom of Norway,47,NOR,0,1,0,EU
+OM,阿曼,Oman,Sultanate of Oman,968,OMN,0,1,0,AS
+PK,巴基斯坦,Pakistan,Islamic Republic of Pakistan,92,PAK,0,0,0,AS
+PW,帕劳群岛,Palau,Republic of Palau,680,PLW,0,0,0,AS
+PS,巴勒斯坦,Palestine,,970,PSE,0,0,0,AS
+PA,巴拿马,Panama,Republic of Panama,507,PAN,0,0,0,NA
+PG,巴布亚新几内亚,Papua New Guinea,Independent State of Papua New Guinea,675,PNG,0,0,0,AF
+PY,巴拉圭,Paraguay,Republic of Paraguay,595,PRY,0,0,0,SA
+PE,秘鲁,Peru,Republic of Peru,51,PER,0,0,0,SA
+PH,菲律宾,Philippines,Republic of the Philippines,63,PHL,0,1,0,AS
+PN,皮特凯恩群岛,Pitcairn,,64,PCN,0,0,0,OC
+PL,波兰,Poland,Republic of Poland,48,POL,1,1,0,EU
+PT,葡萄牙,Portugal,Portuguese Republic,351,PRT,1,1,0,EU
+PR,波多黎各,Puerto Rico,,"1-787, 1-939",PRI,0,0,0,SA
+QA,卡塔尔,Qatar,State of Qatar,974,QAT,0,0,0,AS
+RE,留尼汪,Reunion,,262,REU,0,0,0,AF
+RO,罗马尼亚,Romania,Romania,40,ROU,1,1,0,EU
+RU,俄罗斯,Russia,Russian Federation,7,RUS,0,1,0,EU
+RW,卢旺达,Rwanda,Republic of Rwanda,250,RWA,0,1,0,AF
+BL,圣巴泰勒米,Saint-Barthélemy,,590,BLM,0,0,0,NA
+SH,圣赫勒拿,Saint Helena,,290,SHN,0,0,0,
+KN,圣基茨和尼维斯,Saint Kitts and Nevis,Federation of Saint Kitts and Nevis,1-869,KNA,0,0,0,NA
+LC,圣卢西亚岛,Saint Lucia,Saint Lucia,1-758,LCA,0,0,0,SA
+MF,法属圣马丁,Saint Martin,,590,MAF,0,0,0,
+PM,圣皮埃尔和密克隆,Saint Pierre and Miquelon,,508,SPM,0,0,0,
+VC,圣文森特和格林纳丁斯群岛,Saint Vincent and the Grenadines,Saint Vincent and the Grenadines,1-784,VCT,0,0,0,
+WS,萨摩亚,Samoa,Independent State of Samoa,685,WSM,0,0,0,OC
+SM,圣马力诺,San Marino,Republic of San Marino,378,SMR,0,1,0,EU
+ST,圣多美和普林西比,Sao Tome and Principe,Democratic Republic of Sao Tome and Principe,239,STP,0,1,0,AF
+SA,沙特阿拉伯,Saudi Arabia,Kingdom of Saudi Arabia,966,SAU,0,0,0,AS
+SN,塞内加尔,Senegal,Republic of Senegal,221,SEN,0,0,1,AF
+RS,塞尔维亚,Serbia,Republic of Serbia,381,SRB,0,1,0,EU
+SC,塞舌尔,Seychelles,Republic of Seychelles,248,SYC,0,0,0,AF
+SL,塞拉利昂,Sierra Leone,Republic of Sierra Leone,232,SLE,0,1,0,AF
+SG,新加坡,Singapore,Republic of Singapore,65,SGP,0,1,0,AS
+SX,荷属圣马丁,Sint Maarten,,1-721,SXM,0,0,0,
+SK,斯洛伐克,Slovakia,Slovak Republic,421,SVK,1,1,0,EU
+SI,斯洛文尼亚,Slovenia,Republic of Slovenia,386,SVN,1,1,0,EU
+SB,所罗门群岛,Solomon Islands,Solomon Islands,677,SLB,0,0,0,OC
+SO,索马里,Somalia,Federal Republic of Somalia,252,SOM,0,0,0,AF
+ZA,南非,South Africa,Republic of South Africa,27,ZAF,0,0,0,AF
+SS,南苏丹,South Sudan,Republic of South Sudan,211,SSD,0,0,0,AF
+ES,西班牙,Spain,Kingdom of Spain,34,ESP,1,1,0,EU
+LK,斯里兰卡,Sri Lanka,Democratic Socialist Republic of Sri Lanka,94,LKA,0,0,0,AS
+SD,苏丹,Sudan,Republic of the Sudan,249,SDN,0,1,0,AF
+SR,苏里南,Suriname,Republic of Suriname,597,SUR,0,0,0,SA
+SZ,斯威士兰,Swaziland,Kingdom of Swaziland,268,SWZ,0,1,0,AF
+SE,瑞典,Sweden,Kingdom of Sweden,46,SWE,1,1,0,EU
+CH,瑞士,Switzerland,Swiss Confederation,41,CHE,0,1,0,EU
+SY,叙利亚,Syria,Syrian Arab Republic,963,SYR,0,1,0,AS
+TW,台湾,Taiwan,,886,TWN,0,0,0,AS
+TJ,塔吉克斯坦,Tajikistan,Republic of Tajikistan,992,TJK,0,1,0,AS
+TZ,坦桑尼亚,Tanzania,United Republic of Tanzania,255,TZA,0,0,0,AF
+TH,泰国,Thailand,Kingdom of Thailand,66,THA,0,0,0,AS
+TL,东帝汶,Timor-Leste (East Timor),Democratic Republic of Timor-Leste,670,TLS,0,0,0,AS
+TG,多哥,Togo,Togolese Republic,228,TGO,0,0,1,AF
+TK,托克劳,Tokelau,,690,TKL,0,0,0,
+TO,汤加,Tonga,Kingdom of Tonga,676,TON,0,0,0,OC
+TT,特立尼达和多巴哥,Trinidad and Tobago,Republic of Trinidad and Tobago,1-868,TTO,0,0,0,SA
+TN,突尼斯,Tunisia,Republic of Tunisia,216,TUN,0,1,0,AF
+TR,土耳其,Turkey,Republic of Turkey,90,TUR,0,1,0,AS
+TM,土库曼斯坦,Turkmenistan,Turkmenistan,993,TKM,0,1,0,AS
+TC,特克斯和凯科斯群岛,Turks and Caicos Islands,,1-649,TCA,0,0,0,
+TV,图瓦卢，埃利斯群岛,Tuvalu,Tuvalu,688,TUV,0,0,0,
+VI,美属维尔京群岛,U.S. Virgin Islands,,1-340,VIR,0,0,0,
+UG,乌干达,Uganda,Republic of Uganda,256,UGA,0,0,0,AF
+UA,乌克兰,Ukraine,Ukraine,380,UKR,0,1,0,EU
+AE,阿联酋,United Arab Emirates,United Arab Emirates,971,ARE,0,0,0,AS
+GB,英国,United Kingdom,United Kingdom of Great Britain and Northern Ireland,44,GBR,1,1,0,EU
+US,美国,United States,United States of America,1,USA,0,1,0,NA
+UY,乌拉圭,Uruguay,Oriental Republic of Uruguay,598,URY,0,0,0,SA
+UZ,乌兹别克斯坦,Uzbekistan,Republic of Uzbekistan,998,UZB,0,1,0,AS
+VU,瓦努阿图,Vanuatu,Republic of Vanuatu,678,VUT,0,0,0,
+VE,委内瑞拉,Venezuela,Bolivarian Republic of Venezuela,58,VEN,0,0,0,SA
+VN,越南,Vietnam,Socialist Republic of Vietnam,84,VNM,0,1,0,AS
+WF,瓦利斯和富图纳,Wallis and Futuna,,681,WLF,0,0,0,
+EH,西撒哈拉,Western Sahara,,212,ESH,0,0,0,AF
+YE,也门,Yemen,Republic of Yemen,967,YEM,0,0,0,AS
+ZM,赞比亚,Zambia,Republic of Zambia,260,ZMB,0,1,0,AF
+ZW,津巴布韦,Zimbabwe,Republic of Zimbabwe,263,ZWE,0,1,0,AF

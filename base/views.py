@@ -11,10 +11,15 @@ from . import models
 class ClientDataTable(ModelDataTable):
     name = DataTablesColumn()
     country__name_chs = DataTablesColumn()
-    country__continent__name_chs = DataTablesColumn()
+    country__continent__name_chs = DataTablesColumn('国家名')
 
     dt_serverSide = True
     dt_processing = True
+    # serverSide为True的情况下，
+    # dt_ajax为None(ajax: null)的情况下，是对当前url发出ajax请求
+    # serverSide为False的情况下，
+    # 需要将dt_ajax设置为'.'或'./'来实现对当前url发出ajax请求
+    dt_ajax = './'
 
     class Meta:
         model = models.Client

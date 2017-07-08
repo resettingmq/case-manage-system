@@ -187,12 +187,5 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'country': 'base.models.Country',
     }
 
-    class DataTablesMeta:
-        column_fields = {
-            'id': None,
-            'name': None,
-            'country__name_chs': None
-        }
-
     def __str__(self):
         return '{c.name}'.format(c=self)
