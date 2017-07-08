@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% load datatables_widget %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">客户列表</h3>
+                </div>
+                <div class="box-body">
+                    {% render_table dt_config %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block javascript %}
+    {% render_js_script dt_config %}
+{% endblock javascript %}
