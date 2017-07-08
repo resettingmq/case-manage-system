@@ -1,10 +1,7 @@
 from functools import reduce
 from django.views import generic
 from django.http import JsonResponse
-from django.core.exceptions import ImproperlyConfigured
-from django.db.models import Q
-
-# Create your views here.
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 
 
 class JsonContextMixin:
@@ -75,13 +72,27 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
     def get_json_context_data(self, http_queryset=None):
         """
         : 依赖于其他class的get_queryset()方法
+        : 包含了数据获取，处理的逻辑
         :return: dict
         """
+        json_context = {}
+
         dt_column_fields = self.get_dt_column_fields()
         queryset = self.get_queryset()
         if self.is_server_side():
             if http_queryset is None:
                 raise ValueError('No GET queryset passed in for server-side mode')
+
+            try:
+                draw = int(http_queryset.get('draw'))
+            except ValueError:
+                json_context.update(error='Invalid request arguments')
+                return super().get_json_context_data(**json_context)
+            else:
+                json_context.update(draw=draw)
+            records_total = queryset.count()
+            json_context.update(recordsTotal=records_total)
+
             # 处理filter
             # 只实现了对全局的搜索
             # 没有实现对指定列的搜索
@@ -93,15 +104,21 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
                     [c.get_filter_q_object(pattern, is_regex) for c in self.dt_config.columns.values()]
                 )
             )
+            records_filtered = queryset.count()
+            json_context.update(recordsFiltered=records_filtered)
 
             # 处理order
             order_dir = '' if http_queryset['order[0][dir]'] == 'asc' else '-'
             order_column = list(self.dt_config.columns.values())[int(http_queryset['order[0][column]'])].name
             queryset = queryset.order_by(order_dir + order_column)
 
-        json_context = {
-            self.dt_data_src: list(queryset.values(*dt_column_fields))
-        }
+            # 处理分页
+            page_start = int(http_queryset['start'])
+            page_length = int(http_queryset['length'])
+            queryset = queryset[page_start:page_start + page_length]
+
+        json_context[self.dt_data_src] = list(queryset.values(*dt_column_fields))
+
         return super().get_json_context_data(**json_context)
 
     def get_context_data(self, dt_config=None, **kwargs):
