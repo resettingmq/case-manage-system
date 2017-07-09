@@ -137,15 +137,15 @@ class ModelDataTableMetaClass(type):
 
         # 处理js配置属性，dt_开头的类属性
         js_config = {}
-        for name, value in attrs.items():
-            if name.startswith('dt_'):
-                attr_name = name.split('dt_', 1)[1]
-                js_config[attr_name] = value
         for base in bases:
             for name, value in base.__dict__.items():
                 if name.startswith('dt_'):
                     attr_name = name.split('dt_', 1)[1]
                     js_config[attr_name] = value
+        for name, value in attrs.items():
+            if name.startswith('dt_'):
+                attr_name = name.split('dt_', 1)[1]
+                js_config[attr_name] = value
         d['js_config'] = js_config
 
         d['table_id'] = 'dt-{}'.format(model._meta.model_name)
@@ -161,7 +161,7 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
     dt_rowId = 'pk'
 
     @classmethod
-    def get_field_names(cls):
+    def get_query_fields(cls):
         """
         : 指定json数据中包含的fields，用于对请求的处理函数中
         :return: list，json数据中应该包含的fields
