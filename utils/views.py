@@ -53,7 +53,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
     def is_server_side(self):
         return bool(self.dt_config.dt_serverSide)
 
-    def get_dt_column_fields(self):
+    def get_dt_query_fields(self):
         """
         : 生成DataTables实例所期望的model field names集合
         :return: list, model field names 列表
@@ -67,7 +67,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         #     return []
         # else:
         #     return dt_column_fields
-        return self.dt_config.get_field_names()
+        return self.dt_config.get_query_fields()
 
     def get_json_context_data(self, http_queryset=None):
         """
@@ -77,7 +77,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         """
         json_context = {}
 
-        dt_column_fields = self.get_dt_column_fields()
+        dt_column_fields = self.get_dt_query_fields()
         queryset = self.get_queryset()
         if self.is_server_side():
             if http_queryset is None:

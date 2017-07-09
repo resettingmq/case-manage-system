@@ -141,6 +141,19 @@ class ModelDataTableMetaClass(type):
             if name.startswith('dt_'):
                 attr_name = name.split('dt_', 1)[1]
                 js_config[attr_name] = value
+                if attr_name == 'rowId' and value is not None:
+                    if not isinstance(value, str):
+                        raise ImproperlyConfigured('dt_rowId should be configured as a str')
+                    # 处理dt_rowId,自动生成pk_column
+                    if value == 'pk':
+                        pk_field = _get_field(model, 'id')
+                    else:
+                        pk_field = _get_field(model, value)
+                    if pk_field is None:
+                        raise ImproperlyConfigured('No field was found matching dt_rowId: {}'.format(value))
+                    pk_column = DataTablesColumn.get_instance_from_field(pk_field)
+                    pk_column.name = value
+                    d['pk_column'] = pk_column
         d['js_config'] = js_config
 
         d['table_id'] = 'dt-{}'.format(model._meta.model_name)
@@ -166,7 +179,10 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
         : 指定json数据中包含的fields，用于对请求的处理函数中
         :return: list，json数据中应该包含的fields
         """
-        return cls.columns.keys()
+        query_fields = [c.name for c in cls.columns.values()]
+        # 加入pk_column对应的名字
+        query_fields.append(cls.pk_column.name)
+        return query_fields
 
     @classmethod
     def get_titles(cls):
