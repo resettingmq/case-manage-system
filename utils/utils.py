@@ -137,11 +137,6 @@ class ModelDataTableMetaClass(type):
 
         # 处理js配置属性，dt_开头的类属性
         js_config = {}
-        for base in bases:
-            for name, value in base.__dict__.items():
-                if name.startswith('dt_'):
-                    attr_name = name.split('dt_', 1)[1]
-                    js_config[attr_name] = value
         for name, value in attrs.items():
             if name.startswith('dt_'):
                 attr_name = name.split('dt_', 1)[1]
@@ -154,7 +149,12 @@ class ModelDataTableMetaClass(type):
 
     @classmethod
     def __prepare__(mcls, name, bases):
-        return OrderedDict()
+        od = OrderedDict()
+        for base in bases:
+            for name, value in base.__dict__.items():
+                if name.startswith('dt_'):
+                    od[name] = value
+        return od
 
 
 class ModelDataTable(metaclass=ModelDataTableMetaClass):
