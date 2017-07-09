@@ -156,6 +156,17 @@ class ModelDataTableMetaClass(type):
                     d['pk_column'] = pk_column
         d['js_config'] = js_config
 
+        # 处理detail_url相关
+        detail_url_format = getattr(meta, 'detail_url_format', None)
+        if detail_url_format is None:
+            d['handle_row_click'] = False
+        else:
+            if not isinstance(detail_url_format, str):
+                raise ImproperlyConfigured('Meta.detail_url_format should be a str')
+            d['handle_row_click'] = True
+            d['detail_url_format'] = detail_url_format
+
+        # 生成table_id
         d['table_id'] = 'dt-{}'.format(model._meta.model_name)
 
         return super().__new__(mcls, name, bases, d)
@@ -209,3 +220,12 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
         config = dict(cls.js_config)
         config['columns'] = cls.get_dt_config_columns()
         return config
+
+    @classmethod
+    def get_detail_url(cls, id):
+        """
+        : 根据指定id值获取对应的detail值
+        :param id: 
+        :return: 
+        """
+        pass
