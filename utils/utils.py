@@ -141,6 +141,11 @@ class ModelDataTableMetaClass(type):
             if name.startswith('dt_'):
                 attr_name = name.split('dt_', 1)[1]
                 js_config[attr_name] = value
+        for base in bases:
+            for name, value in base.__dict__.items():
+                if name.startswith('dt_'):
+                    attr_name = name.split('dt_', 1)[1]
+                    js_config[attr_name] = value
         d['js_config'] = js_config
 
         d['table_id'] = 'dt-{}'.format(model._meta.model_name)
@@ -153,6 +158,8 @@ class ModelDataTableMetaClass(type):
 
 
 class ModelDataTable(metaclass=ModelDataTableMetaClass):
+    dt_rowId = 'pk'
+
     @classmethod
     def get_field_names(cls):
         """
