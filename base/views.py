@@ -20,11 +20,13 @@ class ClientDataTable(ModelDataTable):
     # serverSide为False的情况下，
     # 需要将dt_ajax设置为'.'或'./'来实现对当前url发出ajax请求
     dt_ajax = './'
+    dt_rowId = 'id'
 
     class Meta:
         model = models.Client
         fields = ['is_agent']
         column_order = ['country__continent__name_chs', 'name', 'is_agent', 'country__name_chs']
+        detail_url_format = '/client/{}'
 
 
 def index(request):
@@ -35,3 +37,4 @@ class ClientListView(DataTablesListView):
     dt_config = ClientDataTable
     model = models.Client
     template_name = 'base/client_list.html'
+
