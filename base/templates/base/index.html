@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load cms_widget %}
 
 {% load staticfiles %}
 
@@ -8,9 +9,7 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-3 col-sm-6 col-xs-12">
-
-    </div><!-- /.col-md-3 col-sm-6 col-xs-12 -->
+    {% render_infobox 'client' %}
 </div><!-- /.row -->
 
 {% endblock content %}
