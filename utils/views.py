@@ -1,7 +1,11 @@
 from functools import reduce
+from collections import OrderedDict
 from django.views import generic
 from django.http import JsonResponse
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured
+from django.apps import apps
+
+from cms import site_config
 
 
 class JsonContextMixin:
@@ -145,3 +149,42 @@ class DataTablesListView(DataTablesMixin, generic.ListView):
             # if not self.dt_config.dt_serverSide:
                 return self.render_to_json_response(self.get_json_context_data(request.GET))
         return super().get(request, *args, **kwargs)
+
+
+class InfoboxMixin:
+    view_name = None
+    infobox_list = None
+
+    def get_infobox_dict(self):
+        view_name = self.view_name
+        if view_name is None:
+            raise ImproperlyConfigured('Require a name for this view.')
+        infobox_list = self.infobox_list
+        if infobox_list is None:
+            view_config = site_config.VIEWS.get(view_name)
+            if view_config is None:
+                return {}
+            infobox_list = view_config.get('INFO_BOXES')
+            if infobox_list is None:
+                return {}
+        ret = []
+        for infobox_name in infobox_list:
+            try:
+                infobox_conf = site_config.INFO_BOXES[infobox_name]
+                app_label, model_name = infobox_conf['model'].split(':')
+                model = apps.get_model(app_label, model_name)
+            except (AttributeError, KeyError):
+                raise ImproperlyConfigured('Require info box model configuration for {}'.format(infobox_name))
+            except ValueError:
+                raise ImproperlyConfigured('info box model format error: {}'.format(infobox_name))
+            except LookupError:
+                raise ImproperlyConfigured('info box model {}:{} not found: {}'.format(app_label, model_name, infobox_name))
+
+            count = model._default_manager.count()
+            ret.append((infobox_name, {'count': count}))
+
+        return OrderedDict(ret)
+
+    def get_context_data(self, **kwargs):
+        kwargs.update(infobox_dict=self.get_infobox_dict())
+        return super().get_context_data(**kwargs)

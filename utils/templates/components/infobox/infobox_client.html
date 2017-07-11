@@ -6,7 +6,7 @@
         <div class="info-box-content">
             <span class="info-box-text">客户/代理</span>
             <span class="info-box-number">
-                <a href="{% url 'base:client_list' %}">100</a>
+                <a href="{% url 'base:client_list' %}">{{ infobox.count }}</a>
             </span>
         </div>
     </div>

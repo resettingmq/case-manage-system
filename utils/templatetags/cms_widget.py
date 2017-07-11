@@ -16,12 +16,16 @@ class InfoBoxNode(template.Node):
     file_suffix = '.html'
 
     def __init__(self, entity_name):
+        self.entity_name = entity_name
         template_name = '{}{}{}'.format(self.file_prefix, entity_name, self.file_suffix)
         self.template_name = os.path.join(self.template_dir, template_name)
 
     def render(self, context):
         t = context.template.engine.get_template(self.template_name)
-        return t.render(context)
+        new_context = template.Context()
+        new_context['infobox'] = context['infobox_dict'][self.entity_name]
+        print(new_context)
+        return t.render(new_context)
 
 
 @register.tag

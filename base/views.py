@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 
-from utils.views import DataTablesListView
+from utils.views import DataTablesListView, InfoboxMixin
 from utils.utils import ModelDataTable, DataTablesColumn
 from . import models
 
@@ -31,6 +31,11 @@ class ClientDataTable(ModelDataTable):
 
 def index(request):
     return render(request, 'base/index.html')
+
+
+class IndexView(InfoboxMixin, generic.TemplateView):
+    template_name = 'base/index.html'
+    view_name = 'index'
 
 
 class ClientListView(DataTablesListView):
