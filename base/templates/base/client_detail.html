@@ -8,7 +8,15 @@
 
 {% block content %}
     <div class="row">
-        <div class="col-lg-12">
+        <div class="col-md-4">
+            <div class="box box-info">
+                <div class="box-header with-border">
+                    <h3 class="box-title">关联项目</h3>
+                </div>
+                <div class="box-body"></div>
+            </div>
+        </div>
+        <div class="col-md-8">
             <div class="box box-info">
                 <form class="form-horizontal" method="POST">
                     {% csrf_token %}
@@ -16,27 +24,27 @@
                         {% for field in form %}
                         <div class="form-group">
                         {% if field|is_checkbox %}
-                            <div class="checkbox col-md-offset-2 col-lg-offset-1 col-md-5">
+                            <div class="checkbox col-md-offset-2 col-md-8">
                                 <label for="{{ field.id_for_label }}">
                                     {{ field }}
                                     {{ field.label }}
                                 </label>
                             </div>
                         {% else %}
-                            <label for="{{ field.id_for_label }}" class="col-md-2 col-lg-1 control-label">
+                            <label for="{{ field.id_for_label }}" class="col-md-2 control-label">
                                 {{ field.label }}
                             </label>
-                            <div class="col-md-5">
+                            <div class="col-md-8">
                                 {% render_field field class="form-control" %}
                             </div>
-                            <div class="col-md-5"></div>
+                            <div class="col-md-2"></div>
                         {% endif %}
                         </div><!-- /.form-group -->
                         {% endfor %}
                     </div><!-- /.box-body -->
                     <div class="box-footer">
                         <div class="row">
-                            <div class="col-md-7 col-lg-6">
+                            <div class="col-md-10">
                                 <button type="button" class="btn btn-default" onclick="window.location.reload();">取消修改</button>
                                 <button type="submit" class="btn btn-info pull-right">修改</button>
                             </div>

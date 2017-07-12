@@ -16,15 +16,19 @@ class InfoBoxNode(template.Node):
     file_prefix = 'infobox_'
     file_suffix = '.html'
 
-    def __init__(self, entity_name):
+    def __init__(self, entity_name, infobox_type):
         self.entity_name = entity_name
+        self.type = infobox_type
 
     def render(self, context):
         try:
             entity_name = self.entity_name.resolve(context)
         except AttributeError:
             entity_name = self.entity_name
-        template_name = '{}{}{}'.format(self.file_prefix, entity_name, self.file_suffix)
+        file_suffix = self.file_suffix
+        if self.type == 'small':
+            file_suffix = '_small' + file_suffix
+        template_name = '{}{}{}'.format(self.file_prefix, entity_name, file_suffix)
         template_name = os.path.join(self.template_dir, template_name)
         t = context.template.engine.get_template(template_name)
 
@@ -39,18 +43,23 @@ def render_infobox(parser, token):
     :usage: {% render_infobox "client" %}
     """
     try:
-        tag_name, entity_name = token.split_contents()
+        tag_name, entity_name, infobox_type = token.split_contents()
     except ValueError:
-        raise template.TemplateSyntaxError(
-            '{} tag requires exactly one argument: entity name'.format(token.contents.split()[0])
-        )
-    print(entity_name)
+        try:
+            tag_name, entity_name = token.split_contents()
+            infobox_type = 'normal'
+        except ValueError:
+            raise template.TemplateSyntaxError(
+                '{} tag requires exactly one or two argument(s): entity name'.format(token.contents.split()[0])
+            )
     if entity_name[0] == entity_name[-1] and entity_name[0] in ('"', "'"):
         entity_name = entity_name[1:-1]
     else:
         entity_name = template.Variable(entity_name)
+    if infobox_type[0] == infobox_type[-1] and infobox_type[0] in ('"', "'"):
+        infobox_type = infobox_type[1:-1]
 
-    return InfoBoxNode(entity_name)
+    return InfoBoxNode(entity_name, infobox_type)
 
 
 @register.filter

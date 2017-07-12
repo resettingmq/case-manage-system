@@ -10,7 +10,7 @@
 {% block content %}
 <div class="row">
     {% for entity_name in infobox_dict.keys %}
-        {% render_infobox entity_name %}
+        {% render_infobox entity_name 'small' %}
     {% endfor %}
 </div><!-- /.row -->
 
