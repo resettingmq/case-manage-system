@@ -43,3 +43,10 @@ class ClientListView(DataTablesListView):
     model = models.Client
     template_name = 'base/client_list.html'
 
+
+class ClientDetailView(generic.UpdateView):
+    model = models.Client
+    pk_url_kwarg = 'client_id'
+    fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
+              'address', 'postal_code', 'currency', 'country', 'desc']
+    template_name = 'base/client_detail.html'

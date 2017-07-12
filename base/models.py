@@ -3,6 +3,7 @@ import os
 from django.db import models
 from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils import timezone
@@ -189,3 +190,6 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def __str__(self):
         return '{c.name}'.format(c=self)
+
+    def get_absolute_url(self):
+        return reverse('base:client_detail', kwargs={'client_id': self.pk})
