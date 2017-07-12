@@ -50,3 +50,10 @@ class ClientDetailView(generic.UpdateView):
     fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
               'address', 'postal_code', 'currency', 'country', 'desc']
     template_name = 'base/client_detail.html'
+
+
+class ClientCreateView(generic.CreateView):
+    model = models.Client
+    fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
+              'address', 'postal_code', 'currency', 'country', 'desc']
+    template_name = 'base/client_create.html'

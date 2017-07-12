@@ -21,7 +21,7 @@
                 <form class="form-horizontal" method="POST">
                     {% csrf_token %}
                     <div class="box-body">
-                        {% for field in form %}
+                    {% for field in form %}
                         <div class="form-group">
                         {% if field|is_checkbox %}
                             <div class="checkbox col-md-offset-2 col-md-8">
@@ -40,7 +40,7 @@
                             <div class="col-md-2"></div>
                         {% endif %}
                         </div><!-- /.form-group -->
-                        {% endfor %}
+                    {% endfor %}
                     </div><!-- /.box-body -->
                     <div class="box-footer">
                         <div class="row">
