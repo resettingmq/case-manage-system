@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'widget_tweaks',
     'utils',
     'base',
+    'case',
 ]
 
 MIDDLEWARE = [
