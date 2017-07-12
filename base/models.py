@@ -61,6 +61,8 @@ class DescriptionFieldMixin(models.Model):
 
 
 class FakerMixin:
+    # todo:
+    # 1. one to one relationship: 有添加重复外键的可能
     faker_fields = None
     data_path = None
 
@@ -108,8 +110,12 @@ class FakerMixin:
                         data[field_name] = related_model.objects.all()[randint(0, related_obj_count-1)]
                     else:
                         data[field_name] = getattr(fake, fake_type)()
-                fake_objs.append(cls(**data))
-            cls.objects.bulk_create(fake_objs)
+                try:
+                    cls.objects.create(**data)
+                except IntegrityError:
+                    continue
+            #     fake_objs.append(cls(**data))
+            # cls.objects.bulk_create(fake_objs)
 
 
 class Continent(FakerMixin, CommonFieldMixin):
