@@ -6,6 +6,7 @@ Widgets for rendering cms related front-end components
 
 import os
 from django import template
+from django.forms.fields import CheckboxInput
 
 register = template.Library()
 
@@ -50,3 +51,8 @@ def render_infobox(parser, token):
         entity_name = template.Variable(entity_name)
 
     return InfoBoxNode(entity_name)
+
+
+@register.filter
+def is_checkbox(field):
+    return isinstance(field.field.widget, CheckboxInput)

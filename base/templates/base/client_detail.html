@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load cms_widget %}
 
 {% block content-title %}
     客户详情<small>{{ client.name }}</small>
@@ -14,6 +15,14 @@
                     <div class="box-body">
                         {% for field in form %}
                         <div class="form-group">
+                        {% if field|is_checkbox %}
+                            <div class="checkbox col-md-offset-2 col-lg-offset-1 col-md-5">
+                                <label for="{{ field.id_for_label }}">
+                                    {{ field }}
+                                    {{ field.label }}
+                                </label>
+                            </div>
+                        {% else %}
                             <label for="{{ field.id_for_label }}" class="col-md-2 col-lg-1 control-label">
                                 {{ field.label }}
                             </label>
@@ -21,9 +30,10 @@
                                 {% render_field field class="form-control" %}
                             </div>
                             <div class="col-md-5"></div>
-                        </div>
+                        {% endif %}
+                        </div><!-- /.form-group -->
                         {% endfor %}
-                    </div>
+                    </div><!-- /.box-body -->
                     <div class="box-footer">
                         <div class="row">
                             <div class="col-md-7 col-lg-6">
@@ -31,8 +41,7 @@
                                 <button type="submit" class="btn btn-info pull-right">修改</button>
                             </div>
                         </div>
-
-                    </div>
+                    </div><!-- /.box-footer -->
                 </form>
             </div>
         </div>
