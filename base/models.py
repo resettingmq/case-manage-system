@@ -94,6 +94,7 @@ class FakerMixin:
             fake_objs = []
             for i in range(count):
                 data = {}
+
                 for field_name, fake_type in cls.faker_fields.items():
                     is_model_class = not isinstance(fake_type, str)
                     if is_model_class or '.' in fake_type:
@@ -107,7 +108,10 @@ class FakerMixin:
                             except ImportError:
                                 raise
                         related_obj_count = related_model.objects.count()
-                        data[field_name] = related_model.objects.all()[randint(0, related_obj_count-1)]
+                        if related_obj_count == 0:
+                            data[field_name] = None
+                        else:
+                            data[field_name] = related_model.objects.all()[randint(0, related_obj_count-1)]
                     else:
                         data[field_name] = getattr(fake, fake_type)()
                 try:
