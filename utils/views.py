@@ -227,7 +227,7 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             return True
         current_entity_name = self.request.GET.get('current', '')
         action = self.request.GET.get('action', None)
-        if current_entity_name and current_entity_name != self.request.session.get('current_entity_name'):
+        if current_entity_name:
             try:
                 apps.get_model(current_entity_name)
                 self.request.session['current_entity_name'] = current_entity_name
@@ -235,7 +235,7 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             except (LookupError, ValueError):
                 return False
             return True
-        if action and action != self.request.session['action']:
+        if action:
             self.request.session['action'] = action
             return True
         return False
