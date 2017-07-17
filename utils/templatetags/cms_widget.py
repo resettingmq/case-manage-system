@@ -28,7 +28,7 @@ class InfoBoxNode(template.Node):
         file_suffix = self.file_suffix
         if self.type == 'small':
             file_suffix = '_small' + file_suffix
-        template_name = '{}{}{}'.format(self.file_prefix, entity_name, file_suffix)
+        template_name = '{}{}{}'.format(self.file_prefix, entity_name.split('.')[1], file_suffix)
         template_name = os.path.join(self.template_dir, template_name)
         t = context.template.engine.get_template(template_name)
 
