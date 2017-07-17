@@ -8,7 +8,7 @@ app_name = 'base'
 
 client_urlpatterns = [
     url(r'^$', views.ClientListView.as_view(), name='client_list'),
-    url(r'^(?P<client_id>\d+)/$', views.ClientDetailView.as_view(), name='client_detail'),
+    url(r'^(?P<client_id>\d+)/$', views.ClientRelatedEntityView.as_view(), name='client_detail'),
     url(r'^create/$', views.ClientCreateView.as_view(), name='client_create'),
 ]
 

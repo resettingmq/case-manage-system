@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views import generic
 
-from utils.views import DataTablesListView, InfoboxMixin
+from utils.views import DataTablesListView, InfoboxMixin, RelatedEntityView
 from utils.utils import ModelDataTable, DataTablesColumn
 from . import models
 
@@ -45,6 +45,14 @@ class ClientListView(DataTablesListView):
 
 
 class ClientDetailView(generic.UpdateView):
+    model = models.Client
+    pk_url_kwarg = 'client_id'
+    fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
+              'address', 'postal_code', 'currency', 'country', 'desc']
+    template_name = 'base/client_detail.html'
+
+
+class ClientRelatedEntityView(RelatedEntityView):
     model = models.Client
     pk_url_kwarg = 'client_id'
     fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',

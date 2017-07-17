@@ -14,5 +14,15 @@ INFO_BOXES = {
 VIEWS = {
     'index': {
         'INFO_BOXES': ['client']
+    },
+    'client': {
+        'related': {
+            'case': {
+            }
+        }
+    },
+    'case': {
+        'form_fields': [],
+        'dt_class': ''
     }
 }

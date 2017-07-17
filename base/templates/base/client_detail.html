@@ -1,24 +1,15 @@
-{% extends 'base.html' %}
+{% extends 'base_related.html' %}
 {% load widget_tweaks %}
 {% load cms_widget %}
+{% load datatables_widget %}
 
 {% block content-title %}
     客户详情<small>{{ client.name }}</small>
 {% endblock content-title %}
 
-{% block content %}
-    <div class="row">
-        <div class="col-md-4">
-            <div class="box box-info">
-                <div class="box-header with-border">
-                    <h3 class="box-title">关联项目</h3>
-                </div>
-                <div class="box-body"></div>
-            </div>
-        </div>
-        <div class="col-md-8">
-            <div class="box box-info">
-                <form class="form-horizontal" method="POST">
+{% block content_tab %}
+    {% if not view.is_related or view.action == 'create' %}
+    <form class="form-horizontal" method="POST">
                     {% csrf_token %}
                     <div class="box-body">
                     {% for field in form %}
@@ -50,8 +41,14 @@
                             </div>
                         </div>
                     </div><!-- /.box-footer -->
-                </form>
-            </div>
-        </div>
-    </div>
-{% endblock content %}
+    </form>
+    {% else %}
+        {% render_table dt_config %}
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {% if view.is_related and view.action == 'list' %}
+        {% render_js_script dt_config %}
+    {% endif %}
+{% endblock javascript %}

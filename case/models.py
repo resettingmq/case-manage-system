@@ -44,6 +44,8 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     stage = models.ForeignKey(Stage, on_delete=models.SET_NULL, null=True)
     entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
 
+    datatables_class = 'case.views.CaseDataTable'
+
     faker_fields = {
         'name': 'sentence',
         'archive_no': 'isbn13',
@@ -56,6 +58,11 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'entry_country': Country,
         'desc': 'paragraph'
     }
+
+    @classmethod
+    def get_form_fields(cls):
+        return ['name', 'archive_no', 'is_private', 'closed', 'client',
+                'category', 'stage', 'entry_country', 'desc']
 
     def __str__(self):
         return 'Case: {}'.format(self.name)

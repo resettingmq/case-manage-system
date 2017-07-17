@@ -1,9 +1,12 @@
 from functools import reduce
 from collections import OrderedDict
 from django.views import generic
-from django.http import JsonResponse
-from django.core.exceptions import ImproperlyConfigured
+from django.http import JsonResponse, HttpResponseRedirect
+from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.apps import apps
+from django.utils.module_loading import import_string
+
+from utils.utils import ModelDataTable
 
 from cms import site_config
 
@@ -38,7 +41,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
     dt_data_src = 'data'
     dt_config = None
     dt_column_fields = None
-    dt_table_name = None
+    dt_table_id = None
 
     def get_dt_data_src(self):
         return self.dt_data_src
@@ -49,8 +52,8 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         return self.dt_config
 
     def get_dt_table_name(self):
-        if self.dt_table_name is not None:
-            return self.dt_table_name
+        if self.dt_table_id is not None:
+            return self.dt_table_id
         dt_config = self.get_dt_config()
         return self.dt_config.table_id
 
@@ -134,10 +137,8 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         :return: context
         """
         datatables_config = dt_config if dt_config is not None else self.get_dt_config()
-        datatables_id = datatables_config.table_id
         kwargs.update(
-            dt_config=datatables_config,
-            dt_id=datatables_id
+            dt_config=datatables_config
         )
         return super().get_context_data(**kwargs)
 
@@ -156,11 +157,11 @@ class InfoboxMixin:
     infobox_list = None
 
     def get_infobox_dict(self):
-        view_name = self.view_name
-        if view_name is None:
-            raise ImproperlyConfigured('Require a name for this view.')
         infobox_list = self.infobox_list
         if infobox_list is None:
+            view_name = self.view_name
+            if view_name is None:
+                raise ImproperlyConfigured('Require a name for this view.')
             view_config = site_config.VIEWS.get(view_name)
             if view_config is None:
                 return {}
@@ -170,21 +171,183 @@ class InfoboxMixin:
         ret = []
         for infobox_name in infobox_list:
             try:
-                infobox_conf = site_config.INFO_BOXES[infobox_name]
-                app_label, model_name = infobox_conf['model'].split(':')
-                model = apps.get_model(app_label, model_name)
+                # infobox_conf = site_config.INFO_BOXES[infobox_name]
+                model = apps.get_model(infobox_name)
             except (AttributeError, KeyError):
                 raise ImproperlyConfigured('Require info box model configuration for {}'.format(infobox_name))
             except ValueError:
                 raise ImproperlyConfigured('info box model format error: {}'.format(infobox_name))
             except LookupError:
-                raise ImproperlyConfigured('info box model {}:{} not found: {}'.format(app_label, model_name, infobox_name))
+                raise ImproperlyConfigured('info box model not found: {}'.format(infobox_name))
 
             count = model._default_manager.count()
-            ret.append((infobox_name, {'count': count}))
+            ret.append((infobox_name, {'related_entity_name': infobox_name, 'count': count}))
 
         return OrderedDict(ret)
 
     def get_context_data(self, **kwargs):
         kwargs.update(infobox_dict=self.get_infobox_dict())
         return super().get_context_data(**kwargs)
+
+
+class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.MultipleObjectMixin):
+    main_entity = None
+    action = None
+    # config dict 存储与main_entity相关model的信息
+    related_entity_config = None
+
+    def is_related(self):
+        return self.model is not self.main_entity
+
+    def process_query_args(self):
+        """
+        : 用于获取url query string中与related entity相关信息
+        : 包括realted以及action
+        :return: boolean，指示query_args中是否有有效数据
+        """
+        if 'clear' in self.request.GET:
+            try:
+                del self.request.session['current_entity_name']
+                del self.request.session['action']
+            except KeyError:
+                pass
+            return True
+        current_entity_name = self.request.GET.get('current', '')
+        action = self.request.GET.get('action', None)
+        if current_entity_name and current_entity_name != self.request.session.get('current_entity_name'):
+            try:
+                apps.get_model(current_entity_name)
+                self.request.session['current_entity_name'] = current_entity_name
+                self.request.session['action'] = self.request.GET.get('action', 'list')
+            except (LookupError, ValueError):
+                return False
+            return True
+        if action and action != self.request.session['action']:
+            self.request.session['action'] = action
+            return True
+        return False
+
+    def process_session(self):
+        """
+        : 获取session中的related_entity_name, 以及action
+        : 并根据related_entity_str设置self.model
+        :return: 
+        """
+        current_entity_name = self.request.session.get('current_entity_name', '')
+        try:
+            self.main_entity = self.model
+            self.model = apps.get_model(current_entity_name)
+            self.action = self.request.session.get('action', None)
+        except (LookupError, ValueError):
+            pass
+        else:
+            return
+
+    def construct_related_entity(self):
+        """
+        : 进行流程控制，以及相关Mixin的初始化工作
+        :return: 
+        """
+        if self.process_query_args():
+            return True
+        self.process_session()
+        # 设置infobox相关属性
+        self.infobox_list = self.get_related_entity_config().keys()
+        # 设置object_list，因为继承了MultipleObjectMixin，
+        # 在它的get_context_data()中，读取了这个值
+        self.object_list = self.get_queryset()
+
+        try:
+            modelform_name = self.model.get_modelform_name()
+            self.form_class = import_string(modelform_name)
+        except (AttributeError, ImportError):
+            pass
+        try:
+            self.fields = self.model.get_form_fields()
+        except AttributeError:
+            pass
+        if self.fields == None and self.form_class == None:
+            raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+
+        if not self.is_related() or self.action == 'create':
+            # 获取form的fields信息
+            # 设置DatatablesMixin的依赖，避免报错
+            try:
+                modelform_name = self.model.get_modelform_name()
+                self.form_class = import_string(modelform_name)
+            except (AttributeError, ImportError):
+                pass
+            try:
+                self.fields = self.model.get_form_fields()
+            except AttributeError:
+                pass
+            if self.fields == None and self.form_class == None:
+                raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
+                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
+            self.dt_config = ''
+        else:
+            try:
+                datatables_class = self.model.datatables_class
+            except:
+                raise ImproperlyConfigured('No datatables class configured in {}:{}'
+                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
+            if isinstance(datatables_class, str):
+                try:
+                    datatables_class = import_string(datatables_class)
+                except ImportError:
+                    raise ImproperlyConfigured('Error in datatables configured in {}:{}'
+                                               .format(self.model._meta.app_label, self.model._meta.verbose_name))
+            if not issubclass(datatables_class, ModelDataTable):
+                raise ImproperlyConfigured('Improperly configured datatables_class attr in {}:{}'
+                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
+            self.dt_config = datatables_class
+        return False
+
+    def get_related_entity_config(self):
+        # 注意这里要使用self.main_entity
+        # 因为这个设置发生在self.process_session()之后，
+        # 并且是要从main_entity这个model中获取信息
+        related_entity_config = self.related_entity_config or getattr(self.main_entity, 'related_entity_config', None)
+        if related_entity_config is None:
+            raise ImproperlyConfigured('Must configure related entity config for model: {}:{}'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+        if not isinstance(related_entity_config, dict):
+            raise ImproperlyConfigured('Related entity config for {}:{} must be a dict'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+        return related_entity_config
+
+    def get_context_data(self, **kwargs):
+        return super().get_context_data(**kwargs)
+
+
+class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
+    def get(self, request, *args, **kwargs):
+        if self.construct_related_entity():
+            return HttpResponseRedirect(request.path_info)
+        if self.is_related():
+            if self.action == 'create':
+                # 还需要设置self.initial等属性
+                # 以及设置fields
+                self.object = None
+                return self.render_to_response(self.get_context_data())
+            else:
+                self.object = None
+                if request.is_ajax():
+                    return self.render_to_json_response(self.get_json_context_data(request.GET))
+                else:
+                    return self.render_to_response(self.get_context_data())
+        else:
+            return super().get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.process_session()
+        if self.is_related() and self.action == 'create':
+            self.object = None
+            form = self.get_form()
+            if form.is_valid():
+                return self.form_valid(form)
+            else:
+                return self.form_invalid(form)
+        else:
+            return super().post(request, *args, **kwargs)

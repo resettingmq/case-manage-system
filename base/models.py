@@ -184,6 +184,10 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     currency = models.ForeignKey(Currency, null=True, blank=True)
     country = models.ForeignKey(Country, null=True, blank=True)
 
+    related_entity_config = {
+        'case.case': {}
+    }
+
     faker_fields = {
         'name': 'company',
         'is_agent': 'pybool',

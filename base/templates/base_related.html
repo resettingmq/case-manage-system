@@ -1,4 +1,5 @@
 {% load staticfiles %}
+{% load cms_widget %}
 
 <!DOCTYPE html>
 <html>
@@ -167,6 +168,64 @@
     <!-- Main content -->
     <section class="content">
       {% block content %}
+      <div class="row">
+        <div class="col-md-3">
+            <div class="box box-primary">
+                <div class="box-body">
+                    <h3 class="profile-username text-center">
+                        Client name
+                    </h3>
+                    <a href="?clear" class="btn btn-primary btn-block">编辑</a>
+                </div>
+            </div><!-- /.box box-primary -->
+            <div class="box box-primary">
+                <div class="box-header with-border">
+                    <h3 class="box-title">
+                        关联项目
+                    </h3>
+                </div>
+                <div class="box-body">
+                    {% for entity_name in infobox_dict.keys %}
+                        {% render_infobox entity_name 'small' %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div><!-- /.col-md-3 -->
+        <div class="col-md-9">
+            <div class="nav-tabs-custom info">
+                <ul class="nav nav-tabs">
+                    {% if view.is_related %}
+
+                    <li {% if view.action == 'list' %}class="active"{% endif %}>
+                        <a href="{% if view.action == 'list' %}#{% else %}?action=list{% endif %}">
+                            关联项目列表
+                        </a>
+                    </li>
+                    <li {% if view.action == 'create' %}class="active"{% endif %}>
+                        <a href="{% if view.action == 'create' %}#{% else %}?action=create{% endif %}">
+                            新建关联项目
+                        </a>
+                    </li>
+                    <li class="pull-right">
+                        <a href="#" class="text-muted">
+                            <i class="fa fa-gear"></i>
+                        </a>
+                    </li>
+                    {% else %}
+                        <li class="active">
+                        <a href="?current=">详细信息</a>
+                    </li>
+                    {% endif %}
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="content_tab">
+                        {% block content_tab %}
+                        {% endblock content_tab %}
+                    </div>
+                </div>
+            </div><!-- /.nav-tabs-custom -->
+        </div><!-- /.col-md-9 -->
+      </div><!-- /.row -->
       {% endblock  %}
     </section>
     <!-- /.content -->

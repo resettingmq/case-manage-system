@@ -183,6 +183,8 @@ class ModelDataTableMetaClass(type):
 
 class ModelDataTable(metaclass=ModelDataTableMetaClass):
     dt_rowId = 'pk'
+    dt_serverSide = True
+    dt_processing = True
 
     @classmethod
     def get_query_fields(cls):
