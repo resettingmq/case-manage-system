@@ -185,6 +185,8 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
     dt_rowId = 'pk'
     dt_serverSide = True
     dt_processing = True
+    # 这个设置是必须的，否则很多情况下会报错（Cannot set property 'data' of null）
+    dt_ajax = './'
 
     @classmethod
     def get_query_fields(cls):
