@@ -3,8 +3,9 @@
 
 # 配置infobox的信息
 INFO_BOXES = {
-    'client': {
-        'model': 'base:client'
+    'base.client': {
+    },
+    'case.case': {
     }
 }
 
@@ -13,7 +14,7 @@ INFO_BOXES = {
 # 需要在View中指定view_name属性，来获取这个dict中相应的值
 VIEWS = {
     'index': {
-        'INFO_BOXES': ['client']
+        'INFO_BOXES': ['base.client', 'case.case']
     },
     'client': {
         'related': {

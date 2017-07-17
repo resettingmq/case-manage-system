@@ -155,8 +155,11 @@ class InfoboxMixin:
     view_name = None
     infobox_list = None
 
+    def get_infobox_list(self):
+        return self.infobox_list
+
     def get_infobox_dict(self):
-        infobox_list = self.infobox_list
+        infobox_list = self.get_infobox_list()
         if infobox_list is None:
             view_name = self.view_name
             if view_name is None:

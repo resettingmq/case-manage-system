@@ -29,10 +29,6 @@ class ClientDataTable(ModelDataTable):
         detail_url_format = '/client/{}'
 
 
-def index(request):
-    return render(request, 'base/index.html')
-
-
 class IndexView(InfoboxMixin, generic.TemplateView):
     template_name = 'base/index.html'
     view_name = 'index'
