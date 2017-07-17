@@ -185,7 +185,9 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     country = models.ForeignKey(Country, null=True, blank=True)
 
     related_entity_config = {
-        'case.case': {}
+        'case.case': {
+            'query_path': 'client'
+        }
     }
 
     faker_fields = {
@@ -207,3 +209,8 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def get_absolute_url(self):
         return reverse('base:client_detail', kwargs={'client_id': self.pk})
+
+    @classmethod
+    def get_related_entity_config(self):
+        if self.related_entity_config is not None:
+            return self.related_entity_config

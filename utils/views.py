@@ -5,6 +5,7 @@ from django.http import JsonResponse, HttpResponseRedirect
 from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.apps import apps
 from django.utils.module_loading import import_string
+from django.db.models import Q
 
 from utils.utils import ModelDataTable
 
@@ -154,6 +155,7 @@ class DataTablesListView(DataTablesMixin, generic.ListView):
 class InfoboxMixin:
     view_name = None
     infobox_list = None
+    extra_query_object = None
 
     def get_infobox_list(self):
         return self.infobox_list
@@ -182,10 +184,15 @@ class InfoboxMixin:
             except LookupError:
                 raise ImproperlyConfigured('info box model not found: {}'.format(infobox_name))
 
-            count = model._default_manager.count()
+            extra_query_object = self.get_extra_query_object(model_name=infobox_name, model=model)
+            count = model._default_manager.filter(extra_query_object).count()
             ret.append((infobox_name, {'related_entity_name': infobox_name, 'count': count}))
 
         return OrderedDict(ret)
+
+    def get_extra_query_object(self, *args, **kwargs):
+        if self.extra_query_object is None:
+            return Q()
 
     def get_context_data(self, **kwargs):
         kwargs.update(infobox_dict=self.get_infobox_dict())
@@ -194,6 +201,7 @@ class InfoboxMixin:
 
 class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.MultipleObjectMixin):
     main_entity = None
+    main_object = None
     action = None
     # config dict 存储与main_entity相关model的信息
     related_entity_config = None
@@ -254,6 +262,7 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
         """
         if self.process_query_args():
             return True
+        self.main_object = self.get_object()
         self.process_session()
         # 设置infobox相关属性
         self.infobox_list = self.get_related_entity_config().keys()
@@ -301,14 +310,42 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
         # 注意这里要使用self.main_entity
         # 因为这个设置发生在self.process_session()之后，
         # 并且是要从main_entity这个model中获取信息
-        related_entity_config = self.related_entity_config or getattr(self.main_entity, 'related_entity_config', None)
+        # 缓存结果到self.related_entity_config
+        if self.related_entity_config is not None:
+            return self.related_entity_config
+        try:
+            related_entity_config = self.main_entity.get_related_entity_config()
+        except AttributeError:
+            related_entity_config = None
         if related_entity_config is None:
             raise ImproperlyConfigured('Must configure related entity config for model: {}:{}'
-                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+                                       .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
         if not isinstance(related_entity_config, dict):
             raise ImproperlyConfigured('Related entity config for {}:{} must be a dict'
-                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+                                       .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
+        self.related_entity_config = related_entity_config
         return related_entity_config
+
+    def get_extra_query_object(self, model_name, model):
+        """
+        : 继承自InfoboxMixin
+        :param model_name: related app_label.model_name形式
+        :param model: model class
+        :return: Q object
+        """
+        related_entity_config = self.get_related_entity_config()
+        try:
+            query_path = related_entity_config[model_name]['query_path']
+        except KeyError:
+            raise ImproperlyConfigured('Related entity config error: {} to {}:{}'
+                                       .format(
+                model_name,
+                self.main_entity._meta.app_label,
+                self.main_entity._meta.verbose_name
+            ))
+        if not isinstance(query_path, str):
+            raise ValueError('query_path for {} must be a str'.format(model_name))
+        return Q(**{query_path: self.main_object})
 
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs)
