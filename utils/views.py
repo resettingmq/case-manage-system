@@ -128,7 +128,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
 
         return super().get_json_context_data(**json_context)
 
-    def get_context_data(self, dt_config=None, **kwargs):
+    def get_context_data(self, **kwargs):
         """
         : 将ModelDataTables类添加进context
         : 需要依赖与其他class或者mixin
@@ -136,10 +136,9 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         :param kwargs: 额外的命名参数
         :return: context
         """
-        datatables_config = dt_config if dt_config is not None else self.get_dt_config()
-        kwargs.update(
-            dt_config=datatables_config
-        )
+        if 'dt_config' not in kwargs:
+            kwargs['dt_config'] = self.get_dt_config()
+
         return super().get_context_data(**kwargs)
 
 
@@ -205,6 +204,8 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
         : 包括realted以及action
         :return: boolean，指示query_args中是否有有效数据
         """
+        if self.request.method == 'POST':
+            return False
         if 'clear' in self.request.GET:
             try:
                 del self.request.session['current_entity_name']
@@ -255,20 +256,10 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
         self.infobox_list = self.get_related_entity_config().keys()
         # 设置object_list，因为继承了MultipleObjectMixin，
         # 在它的get_context_data()中，读取了这个值
+        # 这个情况比较诡异，虽然MultipleObjectMixin中可以根据关键字参数设置object_list
+        # 但是它用到了pop('object_list', self.object_list)
+        # 即便是字典中有'object_list'这个键，还是会evaluate self.object_list!!!
         self.object_list = self.get_queryset()
-
-        try:
-            modelform_name = self.model.get_modelform_name()
-            self.form_class = import_string(modelform_name)
-        except (AttributeError, ImportError):
-            pass
-        try:
-            self.fields = self.model.get_form_fields()
-        except AttributeError:
-            pass
-        if self.fields == None and self.form_class == None:
-            raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
-                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
 
         if not self.is_related() or self.action == 'create':
             # 获取form的fields信息
@@ -285,7 +276,6 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             if self.fields == None and self.form_class == None:
                 raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
                                            .format(self.model._meta.app_label, self.model._meta.verbose_name))
-            self.dt_config = ''
         else:
             try:
                 datatables_class = self.model.datatables_class
@@ -330,24 +320,36 @@ class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
                 # 还需要设置self.initial等属性
                 # 以及设置fields
                 self.object = None
-                return self.render_to_response(self.get_context_data())
+                return self.render_to_response(self.get_context_data(dt_config=None))
             else:
                 self.object = None
                 if request.is_ajax():
                     return self.render_to_json_response(self.get_json_context_data(request.GET))
                 else:
-                    return self.render_to_response(self.get_context_data())
+                    # 注意：要设置form关键字参数，因为get_context_data()调用链
+                    # 在调用到FormMixin时，如果没有设置这个参数，会自动生成form实例
+                    # 这个在list的情况下是不需要的
+                    return self.render_to_response(self.get_context_data(form=None))
         else:
-            return super().get(request, *args, **kwargs)
+            self.object = self.get_object()
+            return self.render_to_response(self.get_context_data(dt_config=None))
 
     def post(self, request, *args, **kwargs):
-        self.process_session()
-        if self.is_related() and self.action == 'create':
-            self.object = None
+        self.construct_related_entity()
+        if not self.is_related() or self.action == 'create':
+            if self.is_related():
+                self.object = None
+                self.success_url = '{}?action=list'.format(self.request.path_info)
+            else:
+                self.object = self.get_object()
+                self.success_url = self.request.path_info
             form = self.get_form()
             if form.is_valid():
                 return self.form_valid(form)
             else:
-                return self.form_invalid(form)
-        else:
+                return self.render_to_response(self.get_context_data(form=form, dt_config=None))
+        elif not self.is_related():
+
             return super().post(request, *args, **kwargs)
+        else:
+            return self.get(request, *args, **kwargs)
