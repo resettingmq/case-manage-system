@@ -6,6 +6,7 @@ from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
 from django.apps import apps
 from django.utils.module_loading import import_string
 from django.db.models import Q
+from django.forms.models import ModelFormMetaclass
 
 from utils.utils import ModelDataTable
 
@@ -143,7 +144,31 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         return super().get_context_data(**kwargs)
 
 
-class DataTablesListView(DataTablesMixin, generic.ListView):
+class ModelDataTablesMixin(DataTablesMixin):
+    """
+    根据self.model中的相关属性配置DataTablesMixin属性
+    """
+    def config_datatables_from_model(self, dt_config=None):
+        if self.dt_config is not None:
+            return
+        try:
+            datatables_class = self.model.datatables_class
+        except AttributeError:
+            raise ImproperlyConfigured('No datatables class configured in {}:{}'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+        if isinstance(datatables_class, str):
+            try:
+                datatables_class = import_string(datatables_class)
+            except ImportError:
+                raise ImproperlyConfigured('Error in datatables configured in {}:{}'
+                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
+        if not issubclass(datatables_class, ModelDataTable):
+            raise ImproperlyConfigured('Improperly configured datatables_class attr in {}:{}'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+        self.dt_config = datatables_class
+
+
+class DataTablesListView(ModelDataTablesMixin, generic.ListView):
 
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
@@ -199,7 +224,33 @@ class InfoboxMixin:
         return super().get_context_data(**kwargs)
 
 
-class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.MultipleObjectMixin):
+class ConfiguredModelFormMixin:
+    """
+    根据Model中的属性和函数配置FormMixin中相关属性
+    依赖于FormMixin
+    """
+    def config_form_from_model(self):
+        try:
+            modelform_class = self.model.modelform_class
+        except AttributeError:
+            modelform_class = None
+        if isinstance(modelform_class, str):
+            try:
+                modelform_class = import_string(modelform_class)
+            except ImportError:
+                pass
+        if isinstance(modelform_class, ModelFormMetaclass):
+            self.form_class = modelform_class
+        try:
+            self.fields = self.model.form_fields
+        except AttributeError:
+            pass
+        if self.fields == None and self.form_class == None:
+            raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
+                                       .format(self.model._meta.app_label, self.model._meta.verbose_name))
+
+
+class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelDataTablesMixin, generic.list.MultipleObjectMixin):
     main_entity = None
     main_object = None
     current_entity_name = None
@@ -279,35 +330,9 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
 
         if not self.is_related() or self.action == 'create':
             # 获取form的fields信息
-            # 设置DatatablesMixin的依赖，避免报错
-            try:
-                modelform_name = self.model.get_modelform_name()
-                self.form_class = import_string(modelform_name)
-            except (AttributeError, ImportError):
-                pass
-            try:
-                self.fields = self.model.get_form_fields()
-            except AttributeError:
-                pass
-            if self.fields == None and self.form_class == None:
-                raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
-                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
+            self.config_form_from_model()
         else:
-            try:
-                datatables_class = self.model.datatables_class
-            except:
-                raise ImproperlyConfigured('No datatables class configured in {}:{}'
-                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
-            if isinstance(datatables_class, str):
-                try:
-                    datatables_class = import_string(datatables_class)
-                except ImportError:
-                    raise ImproperlyConfigured('Error in datatables configured in {}:{}'
-                                               .format(self.model._meta.app_label, self.model._meta.verbose_name))
-            if not issubclass(datatables_class, ModelDataTable):
-                raise ImproperlyConfigured('Improperly configured datatables_class attr in {}:{}'
-                                           .format(self.model._meta.app_label, self.model._meta.verbose_name))
-            self.dt_config = datatables_class
+            self.config_datatables_from_model()
         return False
 
     def get_related_entity_config(self, model_name=None):

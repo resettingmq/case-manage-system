@@ -59,10 +59,8 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'desc': 'paragraph'
     }
 
-    @classmethod
-    def get_form_fields(cls):
-        return ['name', 'archive_no', 'is_private', 'closed', 'client',
-                'category', 'stage', 'entry_country', 'desc']
+    form_fields = ['name', 'archive_no', 'is_private', 'closed', 'client',
+                   'category', 'stage', 'entry_country', 'desc']
 
     def __str__(self):
         return 'Case: {}'.format(self.name)
