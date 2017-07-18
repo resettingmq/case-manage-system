@@ -65,3 +65,8 @@ def render_infobox(parser, token):
 @register.filter
 def is_checkbox(field):
     return isinstance(field.field.widget, CheckboxInput)
+
+
+@register.inclusion_tag('components/form.html')
+def render_form(form):
+    return {'form': form}
