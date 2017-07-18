@@ -206,6 +206,8 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
     action = None
     # config dict 存储与main_entity相关model的信息
     related_entity_config = None
+    # 用于指定detail页面坐上角显示的概要信息
+    detail_info = {'title': 'name'}
 
     def is_related(self):
         return self.model is not self.main_entity
@@ -387,7 +389,33 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
         return initial
 
+    def get_detail_info(self):
+        try:
+            detail_info = self.main_object.get_detail_info()
+        except AttributeError:
+            detail_info = None
+        if detail_info is not None:
+            print(detail_info)
+            return detail_info
+        detail_info = {}
+        try:
+            detail_info['title'] = getattr(self.main_object, self.detail_info['title'], None)
+        except KeyError:
+            detail_info['title'] = None
+        try:
+            detail_info['sub_title'] = getattr(self.main_object, self.detail_info['sub_title'], None)
+        except KeyError:
+            pass
+        if 'desc' in self.detail_info:
+            detail_info['desc'] = {}
+            for k, v in self.detail_info.get('desc', {}).items():
+                detail_info['desc'][k] = getattr(self.main_object, v, None)
+
+        return detail_info
+
+
     def get_context_data(self, **kwargs):
+        kwargs['detail_info'] = self.get_detail_info()
         return super().get_context_data(**kwargs)
 
 

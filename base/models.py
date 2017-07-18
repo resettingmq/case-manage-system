@@ -210,6 +210,17 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def get_absolute_url(self):
         return reverse('base:client_detail', kwargs={'client_id': self.pk})
 
+    def get_detail_info(self):
+        detail_info = {}
+        desc = {}
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = self.country.name_chs
+        desc['电话'] = self.tel
+        desc['地址'] = self.address
+        detail_info['desc'] = desc
+
+        return detail_info
+
     @classmethod
     def get_related_entity_config(self):
         if self.related_entity_config is not None:
