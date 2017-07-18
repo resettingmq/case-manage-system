@@ -1,6 +1,7 @@
 import os
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin
 from base.models import Client, Country
@@ -45,6 +46,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
 
     datatables_class = 'case.views.CaseDataTable'
+    related_entity_config = {}
 
     faker_fields = {
         'name': 'sentence',
@@ -64,6 +66,26 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def __str__(self):
         return 'Case: {}'.format(self.name)
+
+    def get_absolute_url(self):
+        return reverse('case:case_list')
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = {}
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = self.client.name
+        desc['进入国家'] = self.entry_country.name_chs
+        desc['分类'] = self.category.name
+        desc['阶段'] = self.stage.name
+        detail_info['desc'] = desc
+
+        return detail_info
+
+    @classmethod
+    def get_related_entity_config(self):
+        if self.related_entity_config is not None:
+            return self.related_entity_config
 
 
 class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
