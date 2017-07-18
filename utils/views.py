@@ -369,6 +369,24 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
         query_path = self.get_related_query_path(model_name)
         return Q(**{query_path: self.main_object})
 
+    def get_initial(self):
+        """
+        : 在FormMixin中被定义, 在get_form_kwargs()中被调用
+        :return: 
+        """
+        if not self.is_related():
+            return super().get_initial()
+        initial = {}
+        query_path = self.get_related_query_path(self.current_entity_name)
+        try:
+            field_name, query_string = query_path.split('__', 1)
+        except ValueError:
+            initial[query_path] = self.main_object
+        else:
+            field_related_model = self.model._meta.get_field(field_name).related_model
+            initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
+        return initial
+
     def get_context_data(self, **kwargs):
         return super().get_context_data(**kwargs)
 
