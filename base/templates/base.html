@@ -37,7 +37,7 @@
   <header class="main-header">
 
     <!-- Logo -->
-    <a href="{% url 'base:index' %}" class="logo">
+    <a href="{% url 'index' %}" class="logo">
       <!-- mini logo for sidebar mini 50x50 pixels -->
       <span class="logo-mini"><b>CMS</b></span>
       <!-- logo for regular state and mobile devices -->
@@ -76,12 +76,12 @@
                   <a href="#" class="btn btn-default btn-flat">Profile</a>
                 </div>
                 <div class="pull-right">
-                  <a href="{% url 'base:logout' %}" class="btn btn-default btn-flat">Sign out</a>
+                  <a href="{% url 'logout' %}" class="btn btn-default btn-flat">Sign out</a>
                 </div>
               </li>
             </ul>
             {% else %}
-                <a href="{% url 'base:login' %}">
+                <a href="{% url 'login' %}">
                     <span class="hidden-md">Please Log In</span>
                 </a>
             {% endif %}
@@ -110,7 +110,7 @@
       <ul class="sidebar-menu">
         <li class="header">MAIN NAVIGATION</li>
         <li class="active treeview">
-          <a href="{% url 'base:index' %}">
+          <a href="{% url 'index' %}">
             <i class="fa fa-dashboard"></i> <span>概况</span>
             <span class="pull-right-container">
             </span>
@@ -125,8 +125,8 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{% url 'base:client_list' %}"><i class="fa fa-list-ol"></i>客户列表</a></li>
-            <li><a href="{% url 'base:client_create' %}"><i class="ion ion-person-add"></i>添加客户</a></li>
+            <li><a href="{% url 'client:list' %}"><i class="fa fa-list-ol"></i>客户列表</a></li>
+            <li><a href="{% url 'client:create' %}"><i class="ion ion-person-add"></i>添加客户</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -138,8 +138,8 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="#"><i class="fa fa-list-ol"></i>案件列表</a></li>
-            <li><a href="#"><i class="fa fa-plus-square-o"></i>添加案件</a></li>
+            <li><a href="{% url 'case:case_list' %}"><i class="fa fa-list-ol"></i>案件列表</a></li>
+            <li><a href="{% url 'case:case_create' %}"><i class="fa fa-plus-square-o"></i>添加案件</a></li>
           </ul>
         </li>
         <li class="header">LABELS</li>
