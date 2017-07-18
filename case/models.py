@@ -68,7 +68,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return 'Case: {}'.format(self.name)
 
     def get_absolute_url(self):
-        return reverse('case:case_list')
+        return reverse('case:case_detail', kwargs={'case_id': self.id})
 
     def get_detail_info(self):
         detail_info = {}
