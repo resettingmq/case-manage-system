@@ -205,23 +205,25 @@
         <div class="col-md-9">
             <div class="nav-tabs-custom info">
                 <ul class="nav nav-tabs">
+                    <li>
+                        <a href="#" class="text-muted">
+                            <i class="ion ion-quote"></i>
+                            <b>{{ related_data.related_entity_verbose_name }}</b>
+                        </a>
+                    </li>
                     {% if view.is_related %}
 
                     <li {% if view.action == 'list' %}class="active"{% endif %}>
                         <a href="{% if view.action == 'list' %}#{% else %}?action=list{% endif %}">
-                            关联项目列表
+                            列表
                         </a>
                     </li>
                     <li {% if view.action == 'create' %}class="active"{% endif %}>
                         <a href="{% if view.action == 'create' %}#{% else %}?action=create{% endif %}">
-                            新建关联项目
+                            新建
                         </a>
                     </li>
-                    <li class="pull-right">
-                        <a href="#" class="text-muted">
-                            <i class="fa fa-gear"></i>
-                        </a>
-                    </li>
+
                     {% else %}
                         <li class="active">
                         <a href="?current=">详细信息</a>

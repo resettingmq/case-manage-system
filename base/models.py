@@ -186,7 +186,8 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     related_entity_config = {
         'case.case': {
-            'query_path': 'client'
+            'query_path': 'client',
+            'verbose_name': '案件信息'
         }
     }
 

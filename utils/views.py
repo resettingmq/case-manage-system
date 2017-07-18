@@ -310,24 +310,28 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             self.dt_config = datatables_class
         return False
 
-    def get_related_entity_config(self):
+    def get_related_entity_config(self, model_name=None):
         # 注意这里要使用self.main_entity
         # 因为这个设置发生在self.process_session()之后，
         # 并且是要从main_entity这个model中获取信息
         # 缓存结果到self.related_entity_config
         if self.related_entity_config is not None:
-            return self.related_entity_config
-        try:
-            related_entity_config = self.main_entity.get_related_entity_config()
-        except AttributeError:
-            related_entity_config = None
-        if related_entity_config is None:
-            raise ImproperlyConfigured('Must configure related entity config for model: {}:{}'
-                                       .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
-        if not isinstance(related_entity_config, dict):
-            raise ImproperlyConfigured('Related entity config for {}:{} must be a dict'
-                                       .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
-        self.related_entity_config = related_entity_config
+            related_entity_config = self.related_entity_config
+        else:
+            try:
+                related_entity_config = self.main_entity.get_related_entity_config()
+            except AttributeError:
+                related_entity_config = None
+            if related_entity_config is None:
+                raise ImproperlyConfigured('Must configure related entity config for model: {}:{}'
+                                           .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
+            if not isinstance(related_entity_config, dict):
+                raise ImproperlyConfigured('Related entity config for {}:{} must be a dict'
+                                           .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
+            self.related_entity_config = related_entity_config
+        if model_name is not None:
+            return related_entity_config.get(model_name)
+
         return related_entity_config
 
     def get_related_query_path(self, model_name):
@@ -389,7 +393,7 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
             initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
         return initial
 
-    def get_detail_info(self):
+    def get_detail_info_context(self):
         try:
             detail_info = self.main_object.get_detail_info()
         except AttributeError:
@@ -413,9 +417,18 @@ class RelatedEntityConstructMixin(InfoboxMixin, DataTablesMixin, generic.list.Mu
 
         return detail_info
 
+    def get_related_data_context(self):
+        related_config = self.get_related_entity_config(self.current_entity_name)
+        try:
+            verbose_name = related_config['verbose_name']
+        except (TypeError, KeyError):
+            return None
+        related_data = {'related_entity_verbose_name': verbose_name}
+        return related_data
 
     def get_context_data(self, **kwargs):
-        kwargs['detail_info'] = self.get_detail_info()
+        kwargs['detail_info'] = self.get_detail_info_context()
+        kwargs['related_data'] = self.get_related_data_context()
         return super().get_context_data(**kwargs)
 
 
