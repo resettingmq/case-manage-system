@@ -209,7 +209,7 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return '{c.name}'.format(c=self)
 
     def get_absolute_url(self):
-        return reverse('base:client_detail', kwargs={'client_id': self.pk})
+        return reverse('client:detail', kwargs={'client_id': self.pk})
 
     def get_detail_info(self):
         detail_info = {}
