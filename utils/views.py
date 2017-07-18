@@ -147,6 +147,8 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
 class ModelDataTablesMixin(DataTablesMixin):
     """
     根据self.model中的相关属性配置DataTablesMixin属性
+    注意是动态生成，每次请求都应该被调用，
+    包括ajax请求
     """
     def config_datatables_from_model(self, dt_config=None):
         if self.dt_config is not None:
@@ -166,6 +168,18 @@ class ModelDataTablesMixin(DataTablesMixin):
             raise ImproperlyConfigured('Improperly configured datatables_class attr in {}:{}'
                                        .format(self.model._meta.app_label, self.model._meta.verbose_name))
         self.dt_config = datatables_class
+
+    def get_context_data(self, **kwargs):
+        # 注意：这里也需要对kwargs中的dt_config参数进行判断
+        # 这样才能够与DatatablesMixin统一
+        # 同时在子类中才能够控制self.dt_config的生成获取
+        if 'dt_config' not in kwargs:
+            self.config_datatables_from_model()
+        return super().get_context_data(**kwargs)
+
+    def get_json_context_data(self, *args, **kwargs):
+        self.config_datatables_from_model()
+        return super().get_json_context_data(*args, **kwargs)
 
 
 class DataTablesListView(ModelDataTablesMixin, generic.ListView):
@@ -249,6 +263,14 @@ class ConfiguredModelFormMixin:
             raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
                                        .format(self.model._meta.app_label, self.model._meta.verbose_name))
 
+    def get_form_class(self):
+        """
+        : 重写父类中的get_form_class(),在调用父类方法之前，设置好form相关属性
+        :return: 
+        """
+        self.config_form_from_model()
+        return super().get_form_class()
+
 
 class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelDataTablesMixin, generic.list.MultipleObjectMixin):
     main_entity = None
@@ -328,11 +350,6 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         # 即便是字典中有'object_list'这个键，还是会evaluate self.object_list!!!
         self.object_list = self.get_queryset()
 
-        if not self.is_related() or self.action == 'create':
-            # 获取form的fields信息
-            self.config_form_from_model()
-        else:
-            self.config_datatables_from_model()
         return False
 
     def get_related_entity_config(self, model_name=None):
