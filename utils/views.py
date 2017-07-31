@@ -259,7 +259,7 @@ class ConfiguredModelFormMixin:
             self.fields = self.model.form_fields
         except AttributeError:
             pass
-        if self.fields == None and self.form_class == None:
+        if self.fields is None and self.form_class is None:
             raise ImproperlyConfigured('form_class or fields are not properly configured for model {}:{}'
                                        .format(self.model._meta.app_label, self.model._meta.verbose_name))
 
