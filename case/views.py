@@ -3,7 +3,7 @@ from django.views import generic
 from utils.utils import ModelDataTable, DataTablesColumn
 from utils.views import DataTablesListView, ConfiguredModelFormMixin, RelatedEntityView
 
-from . import models
+from . import models, forms
 
 # Create your views here.
 
@@ -24,10 +24,12 @@ class CaseListView(DataTablesListView):
 
 class CaseRelatedEntityView(RelatedEntityView):
     model = models.Case
+    form_class = forms.CaseModelForm
     pk_url_kwarg = 'case_id'
     template_name = 'case/case_detail.html'
 
 
 class CaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     model = models.Case
+    form_class = forms.CaseModelForm
     template_name = 'case/case_create.html'

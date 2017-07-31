@@ -46,6 +46,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
 
     datatables_class = 'case.views.CaseDataTable'
+    modelform_class = 'case.forms.CaseModelForm'
     related_entity_config = {}
 
     faker_fields = {

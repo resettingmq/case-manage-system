@@ -1,14 +1,18 @@
 {% load widget_tweaks %}
 {% load cms_widget %}
+{% load formfield_widget %}
 
 <div class="box box-info">
     <form class="form-horizontal" method="POST">
         {% csrf_token %}
         <div class="box-body">
         {% for field in form %}
+            {% if field|is_formfield %}
+                {{ field }}
+            {% else %}
             <div class="form-group">
             {% if field|is_checkbox %}
-                <div class="checkbox col-md-offset-2 col-md-8">
+                <div class="checkbox col-md-offset-2 col-md-9">
                     <label for="{{ field.id_for_label }}">
                         {{ field }}
                         {{ field.label }}
@@ -18,16 +22,16 @@
                 <label for="{{ field.id_for_label }}" class="col-md-2 control-label">
                     {{ field.label }}
                 </label>
-                <div class="col-md-8">
+                <div class="col-md-9">
                     {% render_field field class="form-control" %}
                 </div>
-                <div class="col-md-2"></div>
             {% endif %}
             </div>
+            {% endif %}
         {% endfor %}
         </div><!-- /.box-body -->
         <div class="box-footer">
-            <div class="col-md-10">
+            <div class="col-md-11">
                 <button type="button" class="btn btn-default" onclick="window.location.reload();">取消</button>
                 <button type="submit" class="btn btn-info pull-right">增加</button>
             </div>
