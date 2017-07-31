@@ -440,10 +440,38 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             field_name, query_string = query_path.split('__', 1)
         except ValueError:
             initial[query_path] = self.main_object
-        else:
-            field_related_model = self.model._meta.get_field(field_name).related_model
-            initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
+        # else:
+        #     field_related_model = self.model._meta.get_field(field_name).related_model
+        #     initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
         return initial
+
+    def get_form(self):
+        """
+        : 在FormMixin中被定义
+        : 重写用于设置ModelChoiceField的queryset范围
+        :param form_class: 
+        :return: form instance
+        """
+        if not self.is_related():
+            return super().get_form()
+
+        return self.get_related_form()
+
+    def get_related_form(self):
+        """
+        : 重写用于设置ModelChoiceField的queryset范围
+        :return: 
+        """
+        form = super().get_form()
+        query_path = self.get_related_query_path(self.current_entity_name)
+        try:
+            field_name, query_string = query_path.split('__', 1)
+        except ValueError:
+            form.fields[query_path].queryset = form.fields[query_path].queryset.filter(pk=self.main_object.pk)
+        else:
+            queryset = form.fields[field_name].queryset
+            form.fields[field_name].queryset = queryset.filter(**{query_string: self.main_object})
+        return form
 
     def get_detail_info_context(self):
         try:
