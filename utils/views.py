@@ -255,6 +255,7 @@ class ConfiguredModelFormMixin:
                 pass
         if isinstance(modelform_class, ModelFormMetaclass):
             self.form_class = modelform_class
+            return
         try:
             self.fields = self.model.form_fields
         except AttributeError:
@@ -268,7 +269,8 @@ class ConfiguredModelFormMixin:
         : 重写父类中的get_form_class(),在调用父类方法之前，设置好form相关属性
         :return: 
         """
-        self.config_form_from_model()
+        if not self.form_class:
+            self.config_form_from_model()
         return super().get_form_class()
 
 
