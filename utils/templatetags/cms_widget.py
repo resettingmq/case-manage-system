@@ -68,5 +68,10 @@ def is_checkbox(field):
 
 
 @register.inclusion_tag('components/form.html')
-def render_form(form, title=None, show_button=True):
-    return {'form': form, 'title': title, 'show_button': show_button}
+def render_form(form, title=None, show_button=True, button_value=None):
+    return {
+        'form': form,
+        'title': title,
+        'show_button': show_button,
+        'button_value': button_value,
+    }
