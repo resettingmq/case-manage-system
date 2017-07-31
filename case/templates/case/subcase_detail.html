@@ -1,0 +1,27 @@
+{% extends 'base_related.html' %}
+{% load widget_tweaks %}
+{% load cms_widget %}
+{% load formfield_widget %}
+{% load datatables_widget %}
+
+{% block content-title %}
+    分案详情<small>{{ object.name }}</small>
+{% endblock content-title %}
+
+{% block content_tab %}
+    {% if not view.is_related or view.action == 'create' %}
+        {% if not view.is_related %}
+            {% render_form form button_value='修改' %}
+        {% else %}
+            {% render_form form %}
+        {% endif %}
+    {% else %}
+        {% render_table dt_config %}
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {% if view.is_related and view.action == 'list' %}
+        {% render_js_script dt_config %}
+    {% endif %}
+{% endblock javascript %}

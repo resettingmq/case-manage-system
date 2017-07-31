@@ -3,7 +3,6 @@
 from django.conf.urls import url, include
 from django.contrib.auth import views as auth_views
 from . import views
-from case import views as case_views
 
 client_urlpatterns = [
     url(r'^$', views.ClientListView.as_view(), name='list'),
@@ -16,5 +15,4 @@ urlpatterns = [
     url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
     url(r'^client/', include(client_urlpatterns, namespace='client')),
-    url(r'^case/', include('case.urls')),
 ]

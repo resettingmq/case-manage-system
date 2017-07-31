@@ -14,6 +14,12 @@ class ApplicationModelForm(ModelForm):
         fields = ['no', 'name', 'applicant', 'app_date']
 
 
+class SubCaseModelForm(ModelForm):
+    class Meta:
+        model = models.SubCase
+        fields = ['name', 'settled', 'closed', 'agent', 'case', 'stage', 'desc']
+
+
 class CaseModelForm(ModelFormFieldSupportMixin, ModelForm):
     application = ModelFormField(
         ApplicationModelForm,

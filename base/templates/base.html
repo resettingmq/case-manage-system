@@ -129,6 +129,7 @@
             <li><a href="{% url 'client:create' %}"><i class="ion ion-person-add"></i>添加客户</a></li>
           </ul>
         </li>
+        <li class="header">案件相关</li>
         <li class="treeview">
           <a href="#">
             <i class="ion ion-ios-paper-outline"></i>
@@ -138,8 +139,21 @@
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{% url 'case:case_list' %}"><i class="fa fa-list-ol"></i>案件列表</a></li>
-            <li><a href="{% url 'case:case_create' %}"><i class="fa fa-plus-square-o"></i>添加案件</a></li>
+            <li><a href="{% url 'case:list' %}"><i class="fa fa-list-ol"></i>案件列表</a></li>
+            <li><a href="{% url 'case:create' %}"><i class="fa fa-plus-square-o"></i>添加案件</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="ion ion-ios-paper-outline"></i>
+            <span>分案</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'subcase:list' %}"><i class="fa fa-list-ol"></i>分案列表</a></li>
+            <li><a href="{% url 'subcase:create' %}"><i class="fa fa-plus-square-o"></i>添加分案</a></li>
           </ul>
         </li>
         <li class="header">LABELS</li>

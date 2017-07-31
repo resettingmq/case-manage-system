@@ -188,6 +188,11 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'case.case': {
             'query_path': 'client',
             'verbose_name': '案件信息'
+        },
+        'case.subcase': {
+            'related_when': {'is_agent': True},
+            'query_path': 'agent',
+            'verbose_name': '代理分案信息'
         }
     }
 

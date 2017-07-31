@@ -47,7 +47,12 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     datatables_class = 'case.views.CaseDataTable'
     modelform_class = 'case.forms.CaseModelForm'
-    related_entity_config = {}
+    related_entity_config = {
+        'case.subcase': {
+            'query_path': 'case',
+            'verbose_name': '分案信息',
+        }
+    }
 
     faker_fields = {
         'name': 'sentence',
@@ -69,7 +74,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return 'Case: {}'.format(self.name)
 
     def get_absolute_url(self):
-        return reverse('case:case_detail', kwargs={'case_id': self.id})
+        return reverse('case:detail', kwargs={'case_id': self.id})
 
     def get_detail_info(self):
         detail_info = {}
@@ -133,3 +138,59 @@ class Contract(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def __str__(self):
         return 'Contract: {}-{}'.format(self.no, self.case.name)
+
+
+class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('分案名', max_length=200)
+    settled = models.BooleanField('款项结清', default=False)
+    closed = models.BooleanField('结案', default=False)
+
+    agent = models.ForeignKey(
+        'base.Client',
+        related_name='agent_subcase',
+        verbose_name='代理',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    case = models.ForeignKey(
+        Case,
+        verbose_name='所属案件',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    stage = models.ForeignKey(
+        Stage,
+        verbose_name='所处阶段',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+
+    modelform_class = 'case.forms.SubCaseModelForm'
+    datatables_class = 'case.datatables.SubCaseDataTable'
+    related_entity_config = {}
+
+    def __str__(self):
+        return 'SubCase: {}'.format(self.name)
+
+    def get_absolute_url(self):
+        return reverse('subcase:detail', kwargs={'subcase_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(self):
+        if self.related_entity_config is not None:
+            return self.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = {}
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = self.case.name
+        desc['代理'] = self.agent.name
+        desc['阶段'] = self.stage.name
+        desc['结清款项'] = self.settled
+        detail_info['desc'] = desc
+
+        return detail_info
