@@ -255,6 +255,9 @@ class ConfiguredModelFormMixin:
                 pass
         if isinstance(modelform_class, ModelFormMetaclass):
             self.form_class = modelform_class
+            # 设置self.form_class成功之后，self.fields将失效
+            # 避免产生同时设置form_class和fields的错误
+            self.fields = None
             return
         try:
             self.fields = self.model.form_fields
