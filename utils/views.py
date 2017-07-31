@@ -492,6 +492,9 @@ class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
                 # 还需要设置self.initial等属性
                 # 以及设置fields
                 self.object = None
+                # 消除Main model view类属性form_class的影响
+                # 以便使得能够重新加载related model中定义的modelform class
+                self.form_class = None
                 return self.render_to_response(self.get_context_data(dt_config=None))
             else:
                 self.object = None
@@ -511,6 +514,9 @@ class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
         if not self.is_related() or self.action == 'create':
             if self.is_related():
                 self.object = None
+                # 消除Main model view类属性form_class的影响
+                # 以便使得能够重新加载related model中定义的modelform class
+                self.form_class = None
                 self.success_url = '{}?action=list'.format(self.request.path_info)
             else:
                 self.object = self.get_object()
