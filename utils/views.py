@@ -280,6 +280,7 @@ class ConfiguredModelFormMixin:
 class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelDataTablesMixin, generic.list.MultipleObjectMixin):
     main_entity = None
     main_object = None
+    main_entity_name = None
     current_entity_name = None
     action = None
     # config dict 存储与main_entity相关model的信息
@@ -300,7 +301,8 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             return False
         if 'clear' in self.request.GET:
             try:
-                del self.request.session['current_entity_name']
+                # del self.request.session['current_entity_name']
+                del self.request.session[self.main_entity_name]
                 del self.request.session['action']
             except KeyError:
                 pass
@@ -310,7 +312,7 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         if current_entity_name:
             try:
                 apps.get_model(current_entity_name)
-                self.request.session['current_entity_name'] = current_entity_name
+                self.request.session[self.main_entity_name] = current_entity_name
                 self.request.session['action'] = self.request.GET.get('action', 'list')
             except (LookupError, ValueError):
                 return False
@@ -326,7 +328,7 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         : 并根据related_entity_str设置self.model
         :return: 
         """
-        current_entity_name = self.request.session.get('current_entity_name', '')
+        current_entity_name = self.request.session.get(self.main_entity_name, '')
         try:
             self.model = apps.get_model(current_entity_name)
             self.current_entity_name = current_entity_name
@@ -341,9 +343,10 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         : 进行流程控制，以及相关Mixin的初始化工作
         :return: 
         """
+        self.main_entity_name = self.model._meta.label
+        self.main_entity = self.model
         if self.process_query_args():
             return True
-        self.main_entity = self.model
         self.main_object = self.get_object()
         self.process_session()
         # 设置infobox相关属性
@@ -391,6 +394,8 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         try:
             query_path = related_entity_config[model_name]['query_path']
         except KeyError:
+            # 发生KeyError，有可能是其他RelatedEntityView设置了related_model
+            # 而这个related_model在当前model中不存在
             raise ImproperlyConfigured('Related entity config error: {} to {}:{}'
                 .format(
                 model_name,
@@ -446,7 +451,6 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         except AttributeError:
             detail_info = None
         if detail_info is not None:
-            print(detail_info)
             return detail_info
         detail_info = {}
         try:
