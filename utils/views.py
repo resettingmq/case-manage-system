@@ -307,9 +307,15 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             except KeyError:
                 pass
             return True
+
         current_entity_name = self.request.GET.get('current', '')
         action = self.request.GET.get('action', None)
         if current_entity_name:
+            related_entity_config = self.get_related_entity_config()
+            if current_entity_name not in related_entity_config:
+                # 如果GET query args中指定的current_entity_name不存在于related_entity_config中
+                # 则不设置session直接发生跳转。
+                return True
             try:
                 apps.get_model(current_entity_name)
                 self.request.session[self.main_entity_name] = current_entity_name
@@ -329,6 +335,14 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         :return: 
         """
         current_entity_name = self.request.session.get(self.main_entity_name, '')
+        related_entity_config = self.get_related_entity_config()
+        if current_entity_name not in related_entity_config:
+            # 如果session中的current_entity_name不存在于related_entity_config中
+            # 则不设置entity context（保持main_model）。
+            # self.current_entity_name和self.action为None
+            # 如果不这样做，在某些场景下会出现related_entity不存在的情况，即使是按main_model为key来存储related_entity
+            # 例如某些client(agent)对应agent subcase，某些client(非agent)不对应angent subcase
+            return True
         try:
             self.model = apps.get_model(current_entity_name)
             self.current_entity_name = current_entity_name
@@ -345,9 +359,9 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         """
         self.main_entity_name = self.model._meta.label
         self.main_entity = self.model
+        self.main_object = self.get_object()
         if self.process_query_args():
             return True
-        self.main_object = self.get_object()
         self.process_session()
         # 设置infobox相关属性
         self.infobox_list = self.get_related_entity_config().keys()
@@ -378,7 +392,21 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             if not isinstance(related_entity_config, dict):
                 raise ImproperlyConfigured('Related entity config for {}:{} must be a dict'
                                            .format(self.main_entity._meta.app_label, self.main_entity._meta.verbose_name))
-            self.related_entity_config = related_entity_config
+
+            # 复制related_entity_config，避免下面的pop()修改View/Model中设置的类属性
+            self.related_entity_config = dict(related_entity_config)
+            _sentinel = object()
+            for related_name, related_config in related_entity_config.items():
+                related_when = related_config.get('related_when')
+                if related_when is None:
+                    continue
+                for key, val in related_when.items():
+                    obj_val = getattr(self.main_object, key, _sentinel)
+                    if val != obj_val:
+                        self.related_entity_config.pop(related_name)
+                        break
+            related_entity_config = self.related_entity_config
+
         if model_name is not None:
             return related_entity_config.get(model_name)
 
@@ -497,6 +525,11 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         return detail_info
 
     def get_related_data_context(self):
+        """
+        : 生成在template中需要显示的related entity信息
+        : 最终会添加到template context data中
+        :return: dict，如果currenct_entity_name为None，则返回None
+        """
         related_config = self.get_related_entity_config(self.current_entity_name)
         try:
             verbose_name = related_config['verbose_name']
