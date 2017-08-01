@@ -170,6 +170,12 @@ class Currency(FakerMixin, CommonFieldMixin):
         return '{c.id}-{c.name_chs}-{c.name_en}'.format(c=self)
 
 
+class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('名称', max_length=100)
+
+    data_path = os.path.join(BASE_DIR, 'data/owner.json')
+
+
 class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField(max_length=100)
     is_agent = models.BooleanField(default=False)
