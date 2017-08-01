@@ -30,5 +30,5 @@ class CaseModelForm(ModelFormFieldSupportMixin, ModelForm):
 
     class Meta:
         model = models.Case
-        fields = ['name', 'archive_no', 'is_private', 'closed', 'client',
+        fields = ['name', 'archive_no', 'closed', 'client', 'owner',
                   'category', 'stage', 'entry_country', 'desc']

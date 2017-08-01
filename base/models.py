@@ -175,6 +175,9 @@ class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     data_path = os.path.join(BASE_DIR, 'data/owner.json')
 
+    def __str__(self):
+        return self.name
+
 
 class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField(max_length=100)

@@ -4,7 +4,7 @@ from django.conf import settings
 from django.urls import reverse
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin
-from base.models import Client, Country
+from base.models import Client, Country, Owner
 
 # Create your models here.
 
@@ -36,11 +36,11 @@ class Category(FakerMixin, CommonFieldMixin):
 class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField(max_length=200)
     archive_no = models.CharField(max_length=100, null=True, blank=True)
-    is_private = models.BooleanField(default=False)
     settled = models.BooleanField(default=False)
     closed = models.BooleanField(default=False)
 
     client = models.ForeignKey('base.Client', on_delete=models.SET_NULL, null=True)
+    owner = models.ForeignKey('base.Owner', on_delete=models.SET_NULL, null=True)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     stage = models.ForeignKey(Stage, on_delete=models.SET_NULL, null=True)
     entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
@@ -57,17 +57,17 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     faker_fields = {
         'name': 'sentence',
         'archive_no': 'isbn13',
-        'is_private': 'pybool',
         'settled': 'pybool',
         'closed': 'pybool',
         'client': Client,
+        'owner': Owner,
         'category': Category,
         'stage': Stage,
         'entry_country': Country,
         'desc': 'paragraph'
     }
 
-    form_fields = ['name', 'archive_no', 'is_private', 'closed', 'client',
+    form_fields = ['name', 'archive_no', 'owner', 'closed', 'client',
                    'category', 'stage', 'entry_country', 'desc']
 
     def __str__(self):
