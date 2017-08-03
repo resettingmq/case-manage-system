@@ -9,6 +9,9 @@
         <div class="box-body">
             <h3 class="profile-username text-center">
                 {{ detail_info.title }}
+                {% if not detail_info.enabled %}
+                    <span class="badge bg-red pull-right">已删除</span>
+                {% endif %}
             </h3>
             <p class="text-muted text-center">{{ detail_info.sub_title }}</p>
             {% if detail_info.desc %}

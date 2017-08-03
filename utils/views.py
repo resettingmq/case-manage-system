@@ -287,6 +287,8 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
     related_entity_config = None
     # 用于指定detail页面坐上角显示的概要信息
     detail_info = {'title': 'name'}
+    # 用于指定delete(disable)页面url
+    delete_url = None
 
     def is_related(self):
         return self.model is not self.main_entity
@@ -477,11 +479,19 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         """
         : 在FormMixin中被定义
         : 重写用于设置ModelChoiceField的queryset范围
+        : 同时，在非related的情况下，表单提交按钮显示为‘修改’，默认为‘增加’
         :param form_class: 
         :return: form instance
         """
         if not self.is_related():
-            return super().get_form()
+            form = super().get_form()
+            form.submit_button_value = '修改'
+            if not self.object.enabled:
+                # 如果object状态为disabled
+                # 则将form中所有field设置为disabled
+                for field in form.fields.values():
+                    field.disabled = True
+            return form
 
         return self.get_related_form()
 
@@ -541,7 +551,25 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
     def get_context_data(self, **kwargs):
         kwargs['detail_info'] = self.get_detail_info_context()
         kwargs['related_data'] = self.get_related_data_context()
+        kwargs['deletion_url'] = self.get_deletion_url()
         return super().get_context_data(**kwargs)
+
+    def get_deletion_url(self):
+        """
+        : 用于获取delete_url
+        : 依赖于self.object
+        : 依赖于self.object.get_delete_url()
+        : 返回值会被添加到context_data['delete_url']中
+        :return: url or None
+        """
+        if self.delete_url:
+            url = self.delete_url.format(**self.object.__dict__)
+        else:
+            try:
+                url = self.object.get_deletion_url()
+            except AttributeError:
+                url = None
+        return url
 
 
 class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
@@ -592,3 +620,43 @@ class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
             return super().post(request, *args, **kwargs)
         else:
             return self.get(request, *args, **kwargs)
+
+
+class DisablementMixin:
+    """
+    : 处理post()请求，将指定object禁用
+    : 依赖与SingleObjectMixin等类的get_object()方法
+    """
+    success_url = None
+
+    def disable(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if hasattr(self.object, 'enabled'):
+            self.object.enabled = False
+            redirect_url = self.get_success_url()
+            self.object.save()
+        else:
+            # 如果没有enabled属性，
+            # 则重定向到源请求页面
+            redirect_url = request.META.HTTP_REFERER
+        return HttpResponseRedirect(redirect_url)
+
+    def get_success_url(self):
+        if self.success_url:
+            success_url = self.success_url.format(**self.object.__dict__)
+        else:
+            try:
+                success_url = self.object.get_deletion_success_url()
+            except AttributeError:
+                raise ImproperlyConfigured(
+                    "No URL to redirect to. Provide a success_url.")
+        return success_url
+
+
+class DisablementView(DisablementMixin, generic.detail.SingleObjectMixin,
+                      generic.View):
+    """
+    : 直接继承自View，使得仅支持POST方法
+    """
+    def post(self, request, *args, **kwargs):
+        return self.disable(request, *args, **kwargs)
