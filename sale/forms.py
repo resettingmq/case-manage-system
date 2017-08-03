@@ -2,7 +2,7 @@
 
 from decimal import Decimal
 
-from django.forms import ModelForm
+from django.forms import ModelForm, TextInput
 from django.core.exceptions import ValidationError
 
 from . import models
@@ -13,6 +13,16 @@ class ReceivableModelForm(ModelForm):
         model = models.Receivable
         fields = ['no', 'amount', 'currency', 'subcase',
                   'due_date', 'sent_date', 'sent', ]
+        widgets = {
+            'due_date': TextInput(attrs={
+                'data-provide': 'datepicker',
+                'data-date-format': 'yyyy-mm-dd',
+            }),
+            'sent_date': TextInput(attrs={
+                'data-provide': 'datepicker',
+                'data-date-format': 'yyyy-mm-dd',
+            }),
+        }
 
 
 class ReceiptsModelForm(ModelForm):
@@ -20,6 +30,12 @@ class ReceiptsModelForm(ModelForm):
         model = models.Receipts
         fields = ['amount', 'currency', 'exchange_rate', 'transfer_charge',
                   'received_date', 'receivable']
+        widgets = {
+            'received_date': TextInput(attrs={
+                'data-provide': 'datepicker',
+                'data-date-format': 'yyyy-mm-dd',
+            }),
+        }
 
     def clean(self):
         """
