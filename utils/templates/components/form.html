@@ -33,20 +33,20 @@
         <div class="box-footer">
             <div class="col-md-11">
                 <button type="button" class="btn btn-default" onclick="window.location.reload();"
-                        {% if not detail_info.enabled %}disabled{% endif %}>
+                        {% if detail_info.enabled == False %}disabled{% endif %}>
                     取消
                 </button>
 
                 {% if deletion_url %}
                 <button type="button" class="btn btn-danger"
                         data-toggle="modal" data-target="#modal-disable"
-                        {% if not detail_info.enabled %}disabled{% endif %}>
+                        {% if detail_info.enabled == False %}disabled{% endif %}>
                     删除&hellip;
                 </button>
                 {% endif %}
 
                 <button type="submit" class="btn btn-info pull-right"
-                        {% if not detail_info.enabled %}disabled{% endif %}>
+                        {% if detail_info.enabled == False %}disabled{% endif %}>
                     {% if form.submit_button_value %}
                         {{ form.submit_button_value }}
                     {% else %}
