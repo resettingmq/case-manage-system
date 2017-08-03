@@ -10,11 +10,7 @@
 
 {% block content_tab %}
     {% if not view.is_related or view.action == 'create' %}
-        {% if not view.is_related %}
-            {% render_form form button_value='修改' %}
-        {% else %}
-            {% render_form form %}
-        {% endif %}
+        {% render_form %}
     {% else %}
         {% render_table dt_config %}
     {% endif %}

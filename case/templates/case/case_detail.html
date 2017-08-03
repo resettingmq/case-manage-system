@@ -10,48 +10,7 @@
 
 {% block content_tab %}
     {% if not view.is_related or view.action == 'create' %}
-{#    <form class="form-horizontal" method="POST">#}
-{#        {% csrf_token %}#}
-{#        <div class="box-body">#}
-{#        {% for field in form %}#}
-{#            {% if field|is_formfield %}#}
-{#                {{ field }}#}
-{#            {% else %}#}
-{#            <div class="form-group">#}
-{#            {% if field|is_checkbox %}#}
-{#                <div class="checkbox col-md-offset-2 col-md-9">#}
-{#                    <label for="{{ field.id_for_label }}">#}
-{#                        {{ field }}#}
-{#                        {{ field.label }}#}
-{#                    </label>#}
-{#                </div>#}
-{#            {% else %}#}
-{#                <label for="{{ field.id_for_label }}" class="col-md-2 control-label">#}
-{#                    {{ field.label }}#}
-{#                </label>#}
-{#                <div class="col-md-9">#}
-{#                    {% render_field field class="form-control" %}#}
-{#                </div>#}
-{#            {% endif %}#}
-{#            </div><!-- /.form-group -->#}
-{#            {% endif %}#}
-{#        {% endfor %}#}
-{#        </div><!-- /.box-body -->#}
-{#        <div class="box-footer">#}
-{#            <div class="row">#}
-{#                <div class="col-md-11">#}
-{#                    <button type="button" class="btn btn-default" onclick="window.location.reload();">取消修改</button>#}
-{#                    <button type="submit" class="btn btn-info pull-right">修改</button>#}
-{#                </div>#}
-{#            </div>#}
-{#        </div><!-- /.box-footer -->#}
-{#    </form>#}
-{#        {% render_form form %}#}
-        {% if not view.is_related %}
-            {% render_form form button_value='修改' %}
-        {% else %}
-            {% render_form form %}
-        {% endif %}
+        {% render_form %}
     {% else %}
         {% render_table dt_config %}
     {% endif %}
