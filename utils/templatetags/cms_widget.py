@@ -67,11 +67,12 @@ def is_checkbox(field):
     return isinstance(field.field.widget, CheckboxInput)
 
 
-@register.inclusion_tag('components/form.html')
-def render_form(form, title=None, show_button=True, button_value=None):
-    return {
-        'form': form,
-        'title': title,
-        'show_button': show_button,
-        'button_value': button_value,
-    }
+@register.inclusion_tag('components/form.html', takes_context=True)
+def render_form(context):
+    # return {
+    #     'form': form,
+    #     'title': title,
+    #     'show_button': show_button,
+    #     'button_value': button_value,
+    # }
+    return context

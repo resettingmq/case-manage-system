@@ -33,14 +33,51 @@
         <div class="box-footer">
             <div class="col-md-11">
                 <button type="button" class="btn btn-default" onclick="window.location.reload();">取消</button>
+
+                {% if deletion_url %}
+                <button type="button" class="btn btn-danger"
+                        data-toggle="modal" data-target="#modal-disable"
+                        {% if not object.enabled %}disabled{% endif %}>
+                    删除&hellip;
+                </button>
+                {% endif %}
+
                 <button type="submit" class="btn btn-info pull-right">
-                    {% if button_value %}
-                        {{ button_value }}
+                    {% if form.submit_button_value %}
+                        {{ form.submit_button_value }}
                     {% else %}
                         添加
                     {% endif %}
                 </button>
+
             </div>
         </div>
     </form>
+    {% if deletion_url %}
+    <div class="modal modal-danger fade" id="modal-disable">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title">删除&hellip;</h4>
+          </div>
+          <div class="modal-body">
+            <p>删除后数据将丢失，是否继续&hellip;</p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">Close</button>
+            <form method="POST" action="{{ deletion_url }}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline">仍然删除</button>
+            </form>
+
+          </div>
+        </div>
+        <!-- /.modal-content -->
+      </div>
+      <!-- /.modal-dialog -->
+    </div>
+    <!-- /.modal -->
+    {% endif %}
 {#</div>#}
