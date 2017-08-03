@@ -1,0 +1,59 @@
+{% extends 'base_related.html' %}
+{% load widget_tweaks %}
+{% load cms_widget %}
+{% load datatables_widget %}
+
+{% block content-title %}
+    客户详情<small>{{ client.name }}</small>
+{% endblock content-title %}
+
+{% block content_tab %}
+    {% if not view.is_related or view.action == 'create' %}
+{#    <form class="form-horizontal" method="POST">#}
+{#                    {% csrf_token %}#}
+{#                    <div class="box-body">#}
+{#                    {% for field in form %}#}
+{#                        <div class="form-group">#}
+{#                        {% if field|is_checkbox %}#}
+{#                            <div class="checkbox col-md-offset-2 col-md-8">#}
+{#                                <label for="{{ field.id_for_label }}">#}
+{#                                    {{ field }}#}
+{#                                    {{ field.label }}#}
+{#                                </label>#}
+{#                            </div>#}
+{#                        {% else %}#}
+{#                            <label for="{{ field.id_for_label }}" class="col-md-2 control-label">#}
+{#                                {{ field.label }}#}
+{#                            </label>#}
+{#                            <div class="col-md-8">#}
+{#                                {% render_field field class="form-control" %}#}
+{#                            </div>#}
+{#                            <div class="col-md-2"></div>#}
+{#                        {% endif %}#}
+{#                        </div><!-- /.form-group -->#}
+{#                    {% endfor %}#}
+{#                    </div><!-- /.box-body -->#}
+{#                    <div class="box-footer">#}
+{#                        <div class="row">#}
+{#                            <div class="col-md-10">#}
+{#                                <button type="button" class="btn btn-default" onclick="window.location.reload();">取消修改</button>#}
+{#                                <button type="submit" class="btn btn-info pull-right">修改</button>#}
+{#                            </div>#}
+{#                        </div>#}
+{#                    </div><!-- /.box-footer -->#}
+{#    </form>#}
+        {% if not view.is_related %}
+            {% render_form form button_value='修改' %}
+        {% else %}
+            {% render_form form %}
+        {% endif %}
+    {% else %}
+        {% render_table dt_config %}
+    {% endif %}
+{% endblock %}
+
+{% block javascript %}
+    {% if view.is_related and view.action == 'list' %}
+        {% render_js_script dt_config %}
+    {% endif %}
+{% endblock javascript %}

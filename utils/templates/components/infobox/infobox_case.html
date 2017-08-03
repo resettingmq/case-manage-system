@@ -1,0 +1,13 @@
+<div class="col-md-3 col-sm-6 col-xs-12">
+    <div class="info-box">
+        <span class="info-box-icon bg-teal">
+            <i class="ion ion-ios-paper-outline"></i>
+        </span>
+        <div class="info-box-content">
+            <span class="info-box-text">案件</span>
+            <span class="info-box-number">
+                <a href="{% url 'case:case_list' %}">{{ infobox.count }}</a>
+            </span>
+        </div>
+    </div>
+</div> <!-- ./col -->

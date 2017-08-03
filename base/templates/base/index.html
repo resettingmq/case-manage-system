@@ -1,7 +1,19 @@
 {% extends 'base.html' %}
+{% load cms_widget %}
 
 {% load staticfiles %}
 
 {% block content-title %}
-    Welcome to the index page!
+    信息概况
 {% endblock %}
+
+{% block content %}
+    {{ block.super }}
+
+<div class="row">
+    {% for entity_name in infobox_dict.keys %}
+        {% render_infobox entity_name %}
+    {% endfor %}
+</div><!-- /.row -->
+
+{% endblock content %}

@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% load cms_widget %}
+
+{% block content-title %}
+    新增案件
+{% endblock content-title %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <div class="box box-info">
+            {% render_form form %}
+        </div>
+    </div><!-- /.col-md-8 -->
+</div><!-- /.row -->
+{% endblock content %}

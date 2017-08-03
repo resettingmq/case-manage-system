@@ -3,6 +3,7 @@ import os
 from django.db import models
 from django.db.models.signals import post_save
 from django.db.utils import IntegrityError
+from django.urls import reverse
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 from django.utils import timezone
@@ -60,6 +61,8 @@ class DescriptionFieldMixin(models.Model):
 
 
 class FakerMixin:
+    # todo:
+    # 1. one to one relationship: 有添加重复外键的可能
     faker_fields = None
     data_path = None
 
@@ -91,6 +94,7 @@ class FakerMixin:
             fake_objs = []
             for i in range(count):
                 data = {}
+
                 for field_name, fake_type in cls.faker_fields.items():
                     is_model_class = not isinstance(fake_type, str)
                     if is_model_class or '.' in fake_type:
@@ -104,11 +108,18 @@ class FakerMixin:
                             except ImportError:
                                 raise
                         related_obj_count = related_model.objects.count()
-                        data[field_name] = related_model.objects.all()[randint(0, related_obj_count-1)]
+                        if related_obj_count == 0:
+                            data[field_name] = None
+                        else:
+                            data[field_name] = related_model.objects.all()[randint(0, related_obj_count-1)]
                     else:
                         data[field_name] = getattr(fake, fake_type)()
-                fake_objs.append(cls(**data))
-            cls.objects.bulk_create(fake_objs)
+                try:
+                    cls.objects.create(**data)
+                except IntegrityError:
+                    continue
+            #     fake_objs.append(cls(**data))
+            # cls.objects.bulk_create(fake_objs)
 
 
 class Continent(FakerMixin, CommonFieldMixin):
@@ -159,6 +170,15 @@ class Currency(FakerMixin, CommonFieldMixin):
         return '{c.id}-{c.name_chs}-{c.name_en}'.format(c=self)
 
 
+class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('名称', max_length=100)
+
+    data_path = os.path.join(BASE_DIR, 'data/owner.json')
+
+    def __str__(self):
+        return self.name
+
+
 class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField(max_length=100)
     is_agent = models.BooleanField(default=False)
@@ -172,6 +192,18 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     currency = models.ForeignKey(Currency, null=True, blank=True)
     country = models.ForeignKey(Country, null=True, blank=True)
+
+    related_entity_config = {
+        'case.case': {
+            'query_path': 'client',
+            'verbose_name': '案件信息'
+        },
+        'case.subcase': {
+            'related_when': {'is_agent': True},
+            'query_path': 'agent',
+            'verbose_name': '代理分案信息'
+        }
+    }
 
     faker_fields = {
         'name': 'company',
@@ -189,3 +221,22 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def __str__(self):
         return '{c.name}'.format(c=self)
+
+    def get_absolute_url(self):
+        return reverse('client:detail', kwargs={'client_id': self.pk})
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = {}
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = self.country.name_chs
+        desc['电话'] = self.tel
+        desc['地址'] = self.address
+        detail_info['desc'] = desc
+
+        return detail_info
+
+    @classmethod
+    def get_related_entity_config(self):
+        if self.related_entity_config is not None:
+            return self.related_entity_config

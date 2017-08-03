@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load cms_widget %}
+
+{% block content %}
+<div class="row">
+<div class="col-md-3">
+    <div class="box box-primary">
+        <div class="box-body">
+            <h3 class="profile-username text-center">
+                {{ detail_info.title }}
+                {% if not detail_info.enabled %}
+                    <span class="badge bg-red pull-right">已删除</span>
+                {% endif %}
+            </h3>
+            <p class="text-muted text-center">{{ detail_info.sub_title }}</p>
+            {% if detail_info.desc %}
+                <ul class="list-group list-group-unbordered">
+                {% for k, v in detail_info.desc.items %}
+                    <li class="list-group-item">
+                        <b>{{ k }}</b>
+                        <span class="pull-right"
+                              style="text-overflow: ellipsis; white-space: nowrap;
+                              overflow: hidden; max-width: 70%;">
+                            {{ v }}
+                        </span>
+                    </li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+            <a href="?clear" class="btn btn-primary btn-block">编辑</a>
+        </div>
+    </div><!-- /.box box-primary -->
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">
+                关联项目
+            </h3>
+        </div>
+        <div class="box-body">
+            {% for entity_name in infobox_dict.keys %}
+                {% render_infobox entity_name 'small' %}
+            {% endfor %}
+        </div>
+    </div>
+</div><!-- /.col-md-3 -->
+<div class="col-md-9">
+    <div class="nav-tabs-custom info">
+        <ul class="nav nav-tabs">
+            <li>
+                <a href="#" class="text-muted">
+                    <i class="ion ion-quote"></i>
+                    <b>{{ related_data.related_entity_verbose_name }}</b>
+                </a>
+            </li>
+            {% if view.is_related %}
+
+            <li {% if view.action == 'list' %}class="active"{% endif %}>
+                <a href="{% if view.action == 'list' %}#{% else %}?action=list{% endif %}">
+                    列表
+                </a>
+            </li>
+            <li {% if view.action == 'create' %}class="active"{% endif %}>
+                <a href="{% if view.action == 'create' %}#{% else %}?action=create{% endif %}">
+                    新建
+                </a>
+            </li>
+            {% else %}
+                <li class="active">
+                <a href="?current=">详细信息</a>
+            </li>
+            {% endif %}
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane active" id="content_tab">
+                {% block content_tab %}
+                {% endblock content_tab %}
+            </div>
+        </div>
+    </div><!-- /.nav-tabs-custom -->
+</div><!-- /.col-md-9 -->
+</div><!-- /.row -->
+{% endblock content %}
