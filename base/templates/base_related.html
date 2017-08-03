@@ -19,7 +19,11 @@
                 {% for k, v in detail_info.desc.items %}
                     <li class="list-group-item">
                         <b>{{ k }}</b>
-                        <span class="pull-right">{{ v }}</span>
+                        <span class="pull-right"
+                              style="text-overflow: ellipsis; white-space: nowrap;
+                              overflow: hidden; max-width: 70%;">
+                            {{ v }}
+                        </span>
                     </li>
                 {% endfor %}
                 </ul>

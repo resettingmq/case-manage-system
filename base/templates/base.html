@@ -156,6 +156,33 @@
             <li><a href="{% url 'subcase:create' %}"><i class="fa fa-plus-square-o"></i>添加分案</a></li>
           </ul>
         </li>
+        <li class="header">收款相关</li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-newspaper-o"></i>
+            <span>待收款项管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'receivable:list' %}"><i class="fa fa-list-ol"></i>待收款项列表</a></li>
+            <li><a href="{% url 'receivable:create' %}"><i class="fa fa-plus-square-o"></i>添加待收款项</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-money"></i>
+            <span>已收款项管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'receipts:list' %}"><i class="fa fa-list-ol"></i>已收款项列表</a></li>
+            <li><a href="{% url 'receipts:create' %}"><i class="fa fa-plus-square-o"></i>添加已收款项</a></li>
+          </ul>
+        </li>
         <li class="header">LABELS</li>
         <li><a href="#"><i class="fa fa-circle-o text-red"></i> <span>Important</span></a></li>
         <li><a href="#"><i class="fa fa-circle-o text-yellow"></i> <span>Warning</span></a></li>
@@ -180,6 +207,14 @@
 
     <!-- Main content -->
     <section class="content">
+      <!-- Messages display area -->
+      {% if messages %}
+          {% for message in messages %}
+              <div {% if message.tags %}class="{{ message.tags }}"{% endif %}>
+                  <p>{{ message }}</p>
+              </div>
+          {% endfor %}
+      {% endif %}
       {% block content %}
       {% endblock  %}
     </section>

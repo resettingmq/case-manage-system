@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from django.contrib.messages import constants as messages
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -45,6 +46,8 @@ INSTALLED_APPS = [
     'utils.formfield',
     'base',
     'case',
+    'sale',
+    'income',
 ]
 
 MIDDLEWARE = [
@@ -143,3 +146,8 @@ STATICFILES_FINDERS = [
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Messages related settings
+MESSAGE_TAGS = {
+    messages.ERROR: 'callout callout-danger',
+}

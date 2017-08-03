@@ -2,11 +2,12 @@ from functools import reduce
 from collections import OrderedDict
 from django.views import generic
 from django.http import JsonResponse, HttpResponseRedirect
-from django.core.exceptions import ImproperlyConfigured, SuspiciousOperation
+from django.core.exceptions import ImproperlyConfigured, ValidationError
 from django.apps import apps
 from django.utils.module_loading import import_string
 from django.db.models import Q
 from django.forms.models import ModelFormMetaclass
+from django.contrib import messages
 
 from utils.utils import ModelDataTable
 
@@ -628,18 +629,40 @@ class DisablementMixin:
     : 依赖与SingleObjectMixin等类的get_object()方法
     """
     success_url = None
+    error = None
 
-    def disable(self, request, *args, **kwargs):
+    def process_disable(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if hasattr(self.object, 'enabled'):
-            self.object.enabled = False
-            redirect_url = self.get_success_url()
-            self.object.save()
+        self.clean()
+
+        if self.error:
+            redirect_url = request.META['HTTP_REFERER']
+            messages.error(
+                request,
+                ';'.join(self.error.messages)
+            )
         else:
-            # 如果没有enabled属性，
-            # 则重定向到源请求页面
-            redirect_url = request.META.HTTP_REFERER
+            redirect_url = self.get_success_url()
+            self.disable()
+
         return HttpResponseRedirect(redirect_url)
+
+    def disable(self):
+        self.object.enabled = False
+        self.object.save()
+
+    def validate(self):
+        if not hasattr(self.object, 'enabled'):
+            raise ValidationError(
+                '该对象不能被删除',
+                code='invalid'
+            )
+
+    def clean(self):
+        try:
+            self.validate()
+        except ValidationError as e:
+            self.error = e
 
     def get_success_url(self):
         if self.success_url:
@@ -659,4 +682,4 @@ class DisablementView(DisablementMixin, generic.detail.SingleObjectMixin,
     : 直接继承自View，使得仅支持POST方法
     """
     def post(self, request, *args, **kwargs):
-        return self.disable(request, *args, **kwargs)
+        return self.process_disable(request, *args, **kwargs)

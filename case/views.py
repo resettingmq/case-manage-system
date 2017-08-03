@@ -52,6 +52,7 @@ class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     template_name = 'case/subcase_create.html'
 
     def get_form(self, form_class=None):
+        # 需要修改生成form，以限制agent的choice范围
         form = super().get_form(form_class)
         form.fields['agent'].queryset = form.fields['agent'].queryset.filter(is_agent=True)
         return form

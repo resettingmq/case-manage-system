@@ -170,7 +170,12 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     modelform_class = 'case.forms.SubCaseModelForm'
     datatables_class = 'case.datatables.SubCaseDataTable'
-    related_entity_config = {}
+    related_entity_config = {
+        'sale.receivable': {
+            'query_path': 'subcase',
+            'verbose_name': '待收款项',
+        }
+    }
 
     def __str__(self):
         return 'SubCase: {}'.format(self.name)
@@ -179,9 +184,9 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return reverse('subcase:detail', kwargs={'subcase_id': self.id})
 
     @classmethod
-    def get_related_entity_config(self):
-        if self.related_entity_config is not None:
-            return self.related_entity_config
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
 
     def get_detail_info(self):
         detail_info = {}
