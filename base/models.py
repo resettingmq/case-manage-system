@@ -14,6 +14,11 @@ BASE_DIR = settings.BASE_DIR
 # Create your models here.
 
 
+class EnabledEntityManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(enabled=True)
+
+
 class Profile(models.Model):
     avatar_hash = models.CharField(max_length=32, null=True)
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE)
@@ -192,6 +197,9 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     currency = models.ForeignKey(Currency, null=True, blank=True)
     country = models.ForeignKey(Country, null=True, blank=True)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     related_entity_config = {
         'case.case': {

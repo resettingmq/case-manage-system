@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 
-from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin
+from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
 from base.models import Client, Country, Owner
 
 # Create your models here.
@@ -44,6 +44,9 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
     stage = models.ForeignKey(Stage, on_delete=models.SET_NULL, null=True)
     entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     datatables_class = 'case.views.CaseDataTable'
     modelform_class = 'case.forms.CaseModelForm'
@@ -167,6 +170,9 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         null=True,
         blank=True
     )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     modelform_class = 'case.forms.SubCaseModelForm'
     datatables_class = 'case.datatables.SubCaseDataTable'

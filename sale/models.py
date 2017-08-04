@@ -5,7 +5,7 @@ from django.db import models
 from django.conf import settings
 from django.urls import reverse
 
-from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin
+from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
 
 # Create your models here.
 
@@ -37,6 +37,9 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
         on_delete=models.SET_NULL,
         null=True
     )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     modelform_class = 'sale.forms.ReceivableModelForm'
     datatables_class = 'sale.datatables.ReceivableDataTable'
@@ -113,6 +116,9 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
         on_delete=models.SET_NULL,
         null=True
     )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     modelform_class = 'sale.forms.ReceiptsModelForm'
     datatables_class = 'sale.datatables.ReceiptsDataTable'

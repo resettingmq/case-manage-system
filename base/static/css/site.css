@@ -1,0 +1,13 @@
+.btn-datatables i {
+  margin-right: 5px;
+  color: red;
+}
+.btn-datatables i:before {
+  content: "\f372";
+}
+.btn-datatables.activate i {
+  color: limegreen;
+}
+.btn-datatables.activate i:before {
+  content: "\f373";
+}

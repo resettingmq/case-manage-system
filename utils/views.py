@@ -45,6 +45,7 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
     dt_config = None
     dt_column_fields = None
     dt_table_id = None
+    enabled_objects_manager = 'enabled_objects'
 
     def get_dt_data_src(self):
         return self.dt_data_src
@@ -86,6 +87,19 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         :return: dict
         """
         json_context = {}
+
+        # 用于控制是否返回disabled项
+        # 要求model中定义了enabled_objects Manager
+        # 因为初始请求的query args中不存在show_disabled参数
+        # 为了保证默认不显示disabled的项目，这里要将get的默认值设为'0'
+        show_disabled = http_queryset.get('show_disabled', '0')
+        if show_disabled == '0':
+            # 如果没有找到，则self.queryset为None
+            # 这样在下面的执行中会默认使用_default_manager
+            # 所以可以 避免 没有enabled/disabled区分的情况下结果不正确
+            self.queryset = getattr(self.model, self.enabled_objects_manager, None)
+        elif show_disabled == '1':
+            self.queryset = self.model._default_manager
 
         dt_column_fields = self.get_dt_query_fields()
         queryset = self.get_queryset()
@@ -188,7 +202,7 @@ class DataTablesListView(ModelDataTablesMixin, generic.ListView):
     def get(self, request, *args, **kwargs):
         if request.is_ajax():
             # if not self.dt_config.dt_serverSide:
-                return self.render_to_json_response(self.get_json_context_data(request.GET))
+            return self.render_to_json_response(self.get_json_context_data(request.GET))
         return super().get(request, *args, **kwargs)
 
 
@@ -201,6 +215,9 @@ class InfoboxMixin:
         return self.infobox_list
 
     def get_infobox_dict(self):
+        # 将count的查询作用在model.enabled_objects上
+        # 只显示enabled项
+        # 依赖于model定义了enabled_objects Manager
         infobox_list = self.get_infobox_list()
         if infobox_list is None:
             view_name = self.view_name
@@ -225,7 +242,7 @@ class InfoboxMixin:
                 raise ImproperlyConfigured('info box model not found: {}'.format(infobox_name))
 
             extra_query_object = self.get_extra_query_object(model_name=infobox_name, model=model)
-            count = model._default_manager.filter(extra_query_object).count()
+            count = model.enabled_objects.filter(extra_query_object).count()
             ret.append((infobox_name, {'related_entity_name': infobox_name, 'count': count}))
 
         return OrderedDict(ret)
