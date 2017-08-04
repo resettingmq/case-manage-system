@@ -6,6 +6,8 @@ from django.forms import ModelForm, TextInput
 from django.core.exceptions import ValidationError
 
 from . import models
+from base import models as base_models
+from case import models as case_models
 
 
 class ReceivableModelForm(ModelForm):
@@ -24,6 +26,11 @@ class ReceivableModelForm(ModelForm):
             }),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['currency'].queryset = base_models.Currency.enabled_objects
+        self.fields['subcase'].queryset = case_models.SubCase.enabled_objects
+
 
 class ReceiptsModelForm(ModelForm):
     class Meta:
@@ -36,6 +43,11 @@ class ReceiptsModelForm(ModelForm):
                 'data-date-format': 'yyyy-mm-dd',
             }),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['currency'].queryset = base_models.Currency.enabled_objects
+        self.fields['receivable'].queryset = models.Receivable.enabled_objects
 
     def clean(self):
         """
