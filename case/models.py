@@ -79,6 +79,12 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def get_absolute_url(self):
         return reverse('case:detail', kwargs={'case_id': self.id})
 
+    def get_deletion_url(self):
+        return reverse('case:disable', kwargs={'case_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('case:detail', kwargs={'case_id': self.id})
+
     def get_detail_info(self):
         detail_info = {}
         desc = {}
@@ -88,6 +94,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         desc['分类'] = self.category.name
         desc['阶段'] = self.stage.name
         detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
 
         return detail_info
 
@@ -189,6 +196,12 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def get_absolute_url(self):
         return reverse('subcase:detail', kwargs={'subcase_id': self.id})
 
+    def get_deletion_url(self):
+        return reverse('subcase:disable', kwargs={'subcase_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('subcase:detail', kwargs={'subcase_id': self.id})
+
     @classmethod
     def get_related_entity_config(cls):
         if cls.related_entity_config is not None:
@@ -203,5 +216,6 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         desc['阶段'] = self.stage.name
         desc['结清款项'] = self.settled
         detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
 
         return detail_info

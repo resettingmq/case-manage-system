@@ -8,6 +8,7 @@ client_urlpatterns = [
     url(r'^$', views.ClientListView.as_view(), name='list'),
     url(r'^(?P<client_id>\d+)/$', views.ClientRelatedEntityView.as_view(), name='detail'),
     url(r'^create/$', views.ClientCreateView.as_view(), name='create'),
+    url(r'^disable/(?P<client_id>\d+)/$', views.DisablementView.as_view(), name='disable')
 ]
 
 urlpatterns = [

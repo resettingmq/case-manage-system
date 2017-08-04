@@ -1,7 +1,8 @@
 from django.views import generic
 
 from utils.utils import ModelDataTable, DataTablesColumn
-from utils.views import DataTablesListView, ConfiguredModelFormMixin, RelatedEntityView
+from utils.views import DataTablesListView, ConfiguredModelFormMixin,\
+    RelatedEntityView, DisablementView
 
 from . import models, forms, datatables
 
@@ -35,6 +36,11 @@ class CaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     template_name = 'case/case_create.html'
 
 
+class CaseDisableView(DisablementView):
+    model = models.Case
+    pk_url_kwarg = 'case_id'
+
+
 class SubCaseListView(DataTablesListView):
     dt_config = datatables.SubCaseDataTable
     model = models.SubCase
@@ -56,3 +62,8 @@ class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
         form = super().get_form(form_class)
         form.fields['agent'].queryset = form.fields['agent'].queryset.filter(is_agent=True)
         return form
+
+
+class SubCaseDisableView(DisablementView):
+    model = models.SubCase
+    pk_url_kwarg = 'subcase_id'

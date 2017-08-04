@@ -1,6 +1,6 @@
 from django.views import generic
 
-from utils.views import DataTablesListView, InfoboxMixin, RelatedEntityView
+from utils.views import DataTablesListView, InfoboxMixin, RelatedEntityView, DisablementView
 from utils.utils import ModelDataTable, DataTablesColumn
 from . import models
 
@@ -38,13 +38,13 @@ class ClientListView(DataTablesListView):
     model = models.Client
     template_name = 'base/client_list.html'
 
-
-class ClientDetailView(generic.UpdateView):
-    model = models.Client
-    pk_url_kwarg = 'client_id'
-    fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
-              'address', 'postal_code', 'currency', 'country', 'desc']
-    template_name = 'base/client_detail.html'
+#
+# class ClientDetailView(generic.UpdateView):
+#     model = models.Client
+#     pk_url_kwarg = 'client_id'
+#     fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
+#               'address', 'postal_code', 'currency', 'country', 'desc']
+#     template_name = 'base/client_detail.html'
 
 
 class ClientRelatedEntityView(RelatedEntityView):
@@ -60,3 +60,8 @@ class ClientCreateView(generic.CreateView):
     fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
               'address', 'postal_code', 'currency', 'country', 'desc']
     template_name = 'base/client_create.html'
+
+
+class ClientDisableView(DisablementView):
+    model = models.Client
+    pk_url_kwarg = 'client_id'

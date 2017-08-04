@@ -233,6 +233,12 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def get_absolute_url(self):
         return reverse('client:detail', kwargs={'client_id': self.pk})
 
+    def get_deletion_url(self):
+        return reverse('client:disable', kwargs={'client_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('client:detail', kwargs={'client_id': self.id})
+
     def get_detail_info(self):
         detail_info = {}
         desc = {}
@@ -241,6 +247,7 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         desc['电话'] = self.tel
         desc['地址'] = self.address
         detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
 
         return detail_info
 
