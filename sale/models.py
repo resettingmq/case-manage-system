@@ -13,17 +13,18 @@ BASE_DIR = settings.BASE_DIR
 
 
 class Receivable(CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField('待收款账单编号', max_length=100, null=True, blank=True)
+    no = models.CharField('待收款账单编号', max_length=100)
     sent_date = models.DateField('发送日期', null=True, blank=True)
-    sent = models.BooleanField('已发送', default=False)
     due_date = models.DateField('待收期限', null=True, blank=True)
-    amount = models.DecimalField('待收金额', max_digits=10, decimal_places=2)
+    amount = models.DecimalField('待收总金额', max_digits=10, decimal_places=2)
     unsettled_amount = models.DecimalField(
+        '未收总金额',
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True
     )
+    settled = models.BooleanField('客户是否付清', default=False)
 
     subcase = models.ForeignKey(
         'case.SubCase',
