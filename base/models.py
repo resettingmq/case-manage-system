@@ -132,6 +132,9 @@ class Continent(FakerMixin, CommonFieldMixin):
     name_chs = models.CharField(max_length=20, db_index=True)
     name_en = models.CharField(max_length=20, db_index=True)
 
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
     data_path = os.path.join(BASE_DIR, 'data/continent.json')
 
     def __str__(self):
@@ -151,6 +154,9 @@ class Country(FakerMixin, CommonFieldMixin):
 
     continent = models.ForeignKey(Continent, null=True, blank=True)
 
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
     data_path = os.path.join(BASE_DIR, 'data/country.json')
 
     class Meta:
@@ -165,6 +171,9 @@ class Currency(FakerMixin, CommonFieldMixin):
     name_chs = models.CharField(max_length=50)
     name_en = models.CharField(max_length=50)
     symbol = models.CharField(max_length=5, null=True, blank=True)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     data_path = os.path.join(BASE_DIR, 'data/currency.json')
 
