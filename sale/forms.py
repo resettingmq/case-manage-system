@@ -12,7 +12,7 @@ class ReceivableModelForm(ModelForm):
     class Meta:
         model = models.Receivable
         fields = ['no', 'amount', 'currency', 'subcase',
-                  'due_date', 'sent_date',]
+                  'sent_date', 'due_date']
         widgets = {
             'due_date': TextInput(attrs={
                 'data-provide': 'datepicker',

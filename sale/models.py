@@ -79,7 +79,6 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
         desc['货币'] = self.currency.name_chs
         desc['期限'] = self.due_date or '未指定'
         desc['发送日期'] = self.sent_date or '未指定'
-        desc['是否发送'] = self.sent
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
