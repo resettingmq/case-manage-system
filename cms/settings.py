@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'base',
     'case',
     'sale',
+    'purchase',
     'income',
 ]
 
@@ -150,4 +151,5 @@ LOGOUT_REDIRECT_URL = '/'
 # Messages related settings
 MESSAGE_TAGS = {
     messages.ERROR: 'callout callout-danger',
+    messages.SUCCESS: 'callout callout-success',
 }
