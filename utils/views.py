@@ -7,6 +7,7 @@ from django.apps import apps
 from django.utils.module_loading import import_string
 from django.db.models import Q
 from django.forms.models import ModelFormMetaclass
+from django.forms.utils import ErrorList
 from django.contrib import messages
 
 from utils.utils import ModelDataTable
@@ -295,6 +296,32 @@ class ConfiguredModelFormMixin:
         return super().get_form_class()
 
 
+class FormMessageMixin:
+    """
+    : 用于将Form中的成功/失败信息添加到messages中
+    """
+    def form_invalid(self, form):
+        for field, errors in form.errors.items():
+            messages.error(
+                self.request,
+                errors
+            )
+        return super().form_invalid(form)
+
+    def form_valid(self, form):
+        action = '修改' if form.instance.pk else '创建'
+        entity_verbose_name = form.instance._meta.verbose_name
+        message = '{}{}成功'.format(
+            action,
+            entity_verbose_name,
+        )
+        messages.success(
+            self.request,
+            message
+        )
+        return super().form_valid(form)
+
+
 class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelDataTablesMixin, generic.list.MultipleObjectMixin):
     main_entity = None
     main_object = None
@@ -393,6 +420,15 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         self.object_list = self.get_queryset()
 
         return False
+
+    def form_invalid(self, form):
+        """
+        : 重写FormMixin中的form_invalid()方法
+        : 因为在form context(create/update)中，context_data中的dt_config不存在，
+        : 需要通过get_context_data()方法的dt_config=None关键字参数控制
+        : 所以这里需要重写form_invalid()方法
+        """
+        return self.render_to_response(self.get_context_data(form=form, dt_config=None))
 
     def get_related_entity_config(self, model_name=None):
         # 注意这里要使用self.main_entity
@@ -590,7 +626,7 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         return url
 
 
-class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
+class RelatedEntityView(FormMessageMixin, RelatedEntityConstructMixin, generic.UpdateView):
     def get(self, request, *args, **kwargs):
         if self.construct_related_entity():
             return HttpResponseRedirect(request.path_info)
@@ -632,7 +668,7 @@ class RelatedEntityView(RelatedEntityConstructMixin, generic.UpdateView):
             if form.is_valid():
                 return self.form_valid(form)
             else:
-                return self.render_to_response(self.get_context_data(form=form, dt_config=None))
+                return self.form_invalid(form)
         elif not self.is_related():
 
             return super().post(request, *args, **kwargs)
@@ -656,11 +692,16 @@ class DisablementMixin:
             redirect_url = request.META['HTTP_REFERER']
             messages.error(
                 request,
-                ';'.join(self.error.messages)
+                self.error
             )
         else:
             redirect_url = self.get_success_url()
             self.disable()
+            entity_verbose = self.object._meta.verbose_name
+            messages.success(
+                request,
+                '成功删除{}: {}'.format(entity_verbose, self.object)
+            )
 
         return HttpResponseRedirect(redirect_url)
 
@@ -679,7 +720,10 @@ class DisablementMixin:
         try:
             self.validate()
         except ValidationError as e:
-            self.error = e
+            self.error = ErrorList(
+                initlist=e.error_list,
+                error_class='nonfield'
+            )
 
     def get_success_url(self):
         if self.success_url:
