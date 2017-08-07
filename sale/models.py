@@ -51,8 +51,12 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
         }
     }
 
+    class Meta:
+        verbose_name = '待收款项'
+        verbose_name_plural = '待收款项'
+
     def __str__(self):
-        return '{}-{}'.format(self.no, self.amount)
+        return '{}-{}{}'.format(self.no, self.currency_id, self.amount)
 
     def get_absolute_url(self):
         return reverse('receivable:detail', kwargs={'receivable_id': self.id})
@@ -116,8 +120,12 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
     datatables_class = 'sale.datatables.ReceiptsDataTable'
     related_entity_config = {}
 
+    class Meta:
+        verbose_name = '已收款项'
+        verbose_name_plural = '已收款项'
+
     def __str__(self):
-        return '{}-{}'.format(self.amount, self.received_date)
+        return '{}{}-{}'.format(self.currency_id, self.amount, self.received_date)
 
     def get_absolute_url(self):
         return reverse('receipts:detail', kwargs={'receipts_id': self.id})
