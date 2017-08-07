@@ -21,4 +21,5 @@ urlpatterns = [
     url(r'', include('base.urls')),
     url(r'', include('case.urls')),
     url(r'', include('sale.urls')),
+    url(r'', include('purchase.urls')),
 ]

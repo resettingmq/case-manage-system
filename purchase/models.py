@@ -1,30 +1,25 @@
-from collections import OrderedDict
 from decimal import Decimal
+from collections import OrderedDict
 
 from django.db import models
-from django.conf import settings
 from django.urls import reverse
 
-from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
-
-# Create your models here.
-
-BASE_DIR = settings.BASE_DIR
+from base.models import CommonFieldMixin, DescriptionFieldMixin, EnabledEntityManager
 
 
-class Receivable(CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField('待收款账单编号', max_length=100)
-    sent_date = models.DateField('账单发送日期', null=True, blank=True)
-    due_date = models.DateField('待收期限', null=True, blank=True)
-    amount = models.DecimalField('待收总金额', max_digits=10, decimal_places=2)
+class Payable(CommonFieldMixin, DescriptionFieldMixin):
+    no = models.CharField('应付款账单编号', max_length=100)
+    received_date = models.DateField('账单收到日期')
+    due_date = models.DateField('付款期限')
+    amount = models.DecimalField('账单总金额', max_digits=10, decimal_places=2)
     unsettled_amount = models.DecimalField(
-        '未收总金额',
+        '未付金额',
         max_digits=10,
         decimal_places=2,
         null=True,
         blank=True
     )
-    settled = models.BooleanField('客户是否付清', default=False)
+    settled = models.BooleanField('是否付清', default=False)
 
     subcase = models.ForeignKey(
         'case.SubCase',
@@ -42,26 +37,30 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
 
-    modelform_class = 'sale.forms.ReceivableModelForm'
-    datatables_class = 'sale.datatables.ReceivableDataTable'
+    modelform_class = 'purchase.forms.PayableModelForm'
+    datatables_class = 'purchase.datatables.PayableDataTable'
     related_entity_config = {
-        'sale.receipts': {
-            'query_path': 'receivable',
-            'verbose_name': '已收款项'
+        'purchase.payment': {
+            'query_path': 'payable',
+            'verbose_name': '已付款项',
         }
     }
 
+    class Meta:
+        verbose_name = '应付款项'
+        verbose_name_plural = '应付款项'
+
     def __str__(self):
-        return '{}-{}'.format(self.no, self.amount)
+        return '{}-{}{}'.format(self.no, self.currency_id, self.amount)
 
     def get_absolute_url(self):
-        return reverse('receivable:detail', kwargs={'receivable_id': self.id})
+        return reverse('payable:detail', kwargs={'payable_id': self.id})
 
     def get_deletion_url(self):
-        return reverse('receivable:disable', kwargs={'receivable_id': self.id})
+        return reverse('payable:disable', kwargs={'payable_id': self.id})
 
     def get_deletion_success_url(self):
-        return reverse('receivable:detail', kwargs={'receivable_id': self.id})
+        return reverse('payable:detail', kwargs={'payable_id': self.id})
 
     @classmethod
     def get_related_entity_config(cls):
@@ -78,41 +77,35 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
         desc['未收金额'] = self.unsettled_amount
         desc['货币'] = self.currency.name_chs
         desc['期限'] = self.due_date or '未指定'
-        desc['发送日期'] = self.sent_date or '未指定'
+        desc['发送日期'] = self.received_date or '未指定'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
         return detail_info
 
 
-class Receipts(CommonFieldMixin, DescriptionFieldMixin):
-    amount = models.DecimalField('已收款金额', max_digits=10, decimal_places=2)
-    exchange_rate = models.DecimalField('收款汇率', max_digits=8, decimal_places=4, null=True, blank=True)
-    received_date = models.DateField('收款日期')
+class Payment(CommonFieldMixin, DescriptionFieldMixin):
+    amount = models.DecimalField('已付款金额', max_digits=10, decimal_places=2)
+    exchange_rate = models.DecimalField('付款汇率', max_digits=8, decimal_places=2)
+    paid_date = models.DateField('付款日期')
     transfer_charge = models.DecimalField(
         '手续费',
         max_digits=7,
         decimal_places=2,
         default=Decimal,
         null=True,
-        blank=False
+        blank=True,
     )
 
     currency = models.ForeignKey(
         'base.Currency',
-        verbose_name='收款货币',
+        verbose_name='货币',
         on_delete=models.SET_NULL,
         null=True
     )
-    receivable = models.ForeignKey(
-        Receivable,
-        verbose_name='收款账单',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-    deposit = models.ForeignKey(
-        'income.Deposit',
-        verbose_name='客户预存款',
+    payable = models.ForeignKey(
+        Payable,
+        verbose_name='应付款账单',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -120,21 +113,25 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
 
-    modelform_class = 'sale.forms.ReceiptsModelForm'
-    datatables_class = 'sale.datatables.ReceiptsDataTable'
+    modelform_class = 'purchase.forms.PaymentModelForm'
+    datatables_class = 'purchase.datatables.PaymentDataTable'
     related_entity_config = {}
 
+    class Meta:
+        verbose_name = '已付款项'
+        verbose_name_plural = '已付款项'
+
     def __str__(self):
-        return '{}-{}'.format(self.amount, self.received_date)
+        return '{}{}-{}'.format(self.currency_id, self.amount, self.paid_date)
 
     def get_absolute_url(self):
-        return reverse('receipts:detail', kwargs={'receipts_id': self.id})
+        return reverse('payment:detail', kwargs={'payment_id': self.id})
 
     def get_deletion_url(self):
-        return reverse('receipts:disable', kwargs={'receipts_id': self.id})
+        return reverse('payment:disable', kwargs={'payment_id': self.id})
 
     def get_deletion_success_url(self):
-        return reverse('receipts:detail', kwargs={'receipts_id': self.id})
+        return reverse('payment:detail', kwargs={'payment_id': self.id})
 
     @classmethod
     def get_related_entity_config(cls):
@@ -146,11 +143,11 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
         desc = OrderedDict()
         detail_info['title'] = '金额：{}'.format(self.amount)
         detail_info['sub_title'] = ''
-        desc['收款汇率'] = self.exchange_rate or '未设置'
+        desc['付款汇率'] = self.exchange_rate or '未设置'
         desc['货币'] = self.currency.name_chs
-        desc['收款日期'] = self.received_date or '未指定'
+        desc['付款日期'] = self.paid_date or '未指定'
         desc['手续费'] = self.transfer_charge or '未指定'
-        desc['所属待收账单'] = getattr(self.receivable, 'name', '未指定编号')
+        desc['所属待付账单'] = getattr(self.payable, 'name', '未指定编号')
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled

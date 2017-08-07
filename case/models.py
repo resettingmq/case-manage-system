@@ -187,7 +187,11 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'sale.receivable': {
             'query_path': 'subcase',
             'verbose_name': '待收款项',
-        }
+        },
+        'purchase.payable': {
+            'query_path': 'subcase',
+            'verbose_name': '待付款项',
+        },
     }
 
     def __str__(self):

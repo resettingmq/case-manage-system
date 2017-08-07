@@ -23,8 +23,8 @@ DELIMITER ;
 #
 # reciepts的update有几种情况
 # 1. 修改amount
-# 2. 修改receivable_id
-# 3. 修改enabled
+# 2. 修改receivable_id（在前端实现中禁止了这种修改方式）
+# 3. 修改enabled（在前端逻辑中只允许从1->0
 
 DROP TRIGGER IF EXISTS receipts_before_update;
 
