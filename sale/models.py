@@ -87,7 +87,7 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
 
 class Receipts(CommonFieldMixin, DescriptionFieldMixin):
     amount = models.DecimalField('已收款金额', max_digits=10, decimal_places=2)
-    exchange_rate = models.DecimalField('收款汇率', max_digits=8, decimal_places=4, null=True, blank=True)
+    exchange_rate = models.DecimalField('收款汇率', max_digits=8, decimal_places=4)
     received_date = models.DateField('收款日期')
     transfer_charge = models.DecimalField(
         '手续费',
