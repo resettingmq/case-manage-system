@@ -88,14 +88,6 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
     amount = models.DecimalField('已付款金额', max_digits=10, decimal_places=2)
     exchange_rate = models.DecimalField('付款汇率', max_digits=8, decimal_places=2)
     paid_date = models.DateField('付款日期')
-    transfer_charge = models.DecimalField(
-        '手续费',
-        max_digits=7,
-        decimal_places=2,
-        default=Decimal,
-        null=True,
-        blank=True,
-    )
 
     currency = models.ForeignKey(
         'base.Currency',

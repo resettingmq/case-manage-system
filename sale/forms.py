@@ -2,12 +2,16 @@
 
 from decimal import Decimal
 
-from django.forms import ModelForm, TextInput
+from django.forms import ModelForm, TextInput, DecimalField
 from django.core.exceptions import ValidationError
 
 from . import models
 from base import models as base_models
 from case import models as case_models
+from expense import models as expense_models
+
+from utils.formfield.forms import ModelFormFieldSupportMixin
+from utils.formfield.fields import ModelFormField
 
 
 class ReceivableModelForm(ModelForm):
@@ -32,10 +36,37 @@ class ReceivableModelForm(ModelForm):
         self.fields['subcase'].queryset = case_models.SubCase.enabled_objects
 
 
-class ReceiptsModelForm(ModelForm):
+class TransferChargeModelForm(ModelForm):
+    amount = DecimalField(
+        max_digits=7,
+        decimal_places=2,
+        label='金额',
+        initial=Decimal
+    )
+
+    class Meta:
+        model = expense_models.Expense
+        fields = ['amount']
+
+    def __init__(self, *args, **kwargs):
+        # form被初始化时，如果instance为空，
+        # 则将expense_type指向默认的101（收款手续费）
+        super().__init__(*args, **kwargs)
+        if self.instance.pk is None:
+            self.instance.expense_type_id = 101
+
+
+class ReceiptsModelForm(ModelFormFieldSupportMixin, ModelForm):
+    transfer_charge = ModelFormField(
+        TransferChargeModelForm,
+        title='转账手续费（人民币）',
+        prefix='receipts',
+        using_template=True
+    )
+
     class Meta:
         model = models.Receipts
-        fields = ['amount', 'currency', 'exchange_rate', 'transfer_charge',
+        fields = ['amount', 'currency', 'exchange_rate',
                   'received_date', 'receivable']
         widgets = {
             'received_date': TextInput(attrs={
