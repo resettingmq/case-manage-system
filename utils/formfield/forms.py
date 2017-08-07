@@ -86,7 +86,7 @@ class ModelFormFieldSupportMixin(FormFieldSupportMixin,
                 if inner_opts.get_field(inner_field_name).related_model is outer_model:
                     self[name].inner_form.fields.pop(inner_field_name)
 
-    # @transaction.atomic
+    @transaction.atomic
     def save(self, commit=True):
 
         outer_obj = super().save(commit=commit)
