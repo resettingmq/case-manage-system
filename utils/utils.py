@@ -49,6 +49,10 @@ class DataTablesColumn:
             self.title = field.verbose_name
         self._field = field
         self._bound = True
+        if field.is_relation:
+            # 如果指定的field为ForeignKey, OneToOne等relationship
+            # 则该列强制为不能搜索
+            self.searchable = False
 
     def get_dt_column_config(self):
         dt__column_config = {}
