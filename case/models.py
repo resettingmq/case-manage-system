@@ -192,6 +192,10 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             'query_path': 'subcase',
             'verbose_name': '待付款项',
         },
+        'expense.expense': {
+            'query_path': 'subcase',
+            'verbose_name': '其它支出'
+        }
     }
 
     def __str__(self):

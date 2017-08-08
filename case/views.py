@@ -1,4 +1,5 @@
 from django.views import generic
+from django.core.exceptions import ValidationError
 
 from utils.utils import ModelDataTable, DataTablesColumn
 from utils.views import DataTablesListView, ConfiguredModelFormMixin,\
@@ -67,3 +68,11 @@ class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
 class SubCaseDisableView(DisablementView):
     model = models.SubCase
     pk_url_kwarg = 'subcase_id'
+
+    def validate(self):
+        if len(self.object.expense_set.all()) != 0:
+            raise ValidationError(
+                '不能删除该分案件：该分案件具有关联的其它支出',
+                code='invalid',
+            )
+        super().validate()

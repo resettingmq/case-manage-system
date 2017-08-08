@@ -48,13 +48,6 @@ class TransferChargeModelForm(forms.ModelForm):
         model = expense_models.Expense
         fields = ['amount']
 
-    def __init__(self, *args, **kwargs):
-        # form被初始化时，如果instance为空，
-        # 则将expense_type指向默认的100（汇款手续费）
-        super().__init__(*args, **kwargs)
-        if self.instance.pk is None:
-            self.instance.expense_type_id = 100
-
 
 class PaymentModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
     transfer_charge = ModelFormField(
@@ -93,3 +86,10 @@ class PaymentModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
         limit = self.cleaned_data['payable'].unsettled_amount
         if new_amount - old_amount > limit:
             raise ValidationError('付款金额不能大于待付款金额')
+
+    def before_save_related(self):
+        # 在存储related formfield之前
+        # 1. 将transfer_charge formfield的发生日期设置为付款日期
+        # 2. 将expense_type_id设置为100（汇款手续费）
+        self['transfer_charge'].inner_form.instance.incurred_date = self.instance.paid_date
+        self['transfer_charge'].inner_form.instance.expense_type_id = 100

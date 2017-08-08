@@ -57,3 +57,10 @@ class PaymentCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.Crea
 class PaymentDisableView(DisablementView):
     model = models.Payment
     pk_url_kwarg = 'payment_id'
+
+    def disable(self):
+        # 在禁用Payment之前，需要禁用关联的Expense
+        if self.object.transfer_charge:
+            self.object.transfer_charge.enabled = False
+            self.object.transfer_charge.save()
+        super().disable()
