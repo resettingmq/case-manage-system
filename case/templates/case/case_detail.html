@@ -138,9 +138,14 @@
                             </th>
                         </tr>
 
-                        <tr style="text-align: left;">
-                            <th colspan="5">
+                        <tr>
+                            <th colspan="4">
                                 <span style="margin-left: 50px;"><i>其它支出</i></span>
+                            </th>
+                            <th style="font-size: 16px; text-align: right;">
+                                <span style="color: #00a65a;">
+                                    <b>&#65509;-{{ subcase.expense_sum_cny|floatformat:2 }}</b>
+                                </span>
                             </th>
                         </tr>
                         {% for expense in subcase.expense_set.all %}
