@@ -84,9 +84,8 @@
                                 <b>收款小计(减去手续费)：</b>
                             </td>
                             <td style="font-size: 16px;">
-                                 &#65509;
                                 <span style="color: #d33724;">
-                                    <b>{{ subcase.receipts_sum_cny|floatformat:2 }}</b>
+                                    <b>&#65509;{{ subcase.receipts_sum_cny|floatformat:2 }}</b>
                                 </span>
                             </td>
                         </tr>
@@ -127,9 +126,8 @@
                                 <b>付款小计(包含手续费)：</b>
                             </td>
                             <td style="font-size: 16px;">
-                                 &#65509;
                                 <span style="color: #00a65a;">
-                                    <b>-{{ subcase.payment_sum_cny|floatformat:2 }}</b>
+                                    <b>&#65509;-{{ subcase.payment_sum_cny|floatformat:2 }}</b>
                                 </span>
                             </td>
                         </tr>
@@ -146,6 +144,7 @@
                             </th>
                         </tr>
                         {% for expense in subcase.expense_set.all %}
+                        {% if expense.enabled %}
                         <tr>
                             <td>
                                 <span style="margin-right: 50px;"><i>{{ expense.expense_type.name }}</i></span>
@@ -166,6 +165,7 @@
                                 <span style="color: #00a65a;"><b>-</b>{{ expense.amount_cny|floatformat:2 }}</span>
                             </td>
                         </tr>
+                        {% endif %}
                         {% endfor %}
                     {% endfor %}
                     </tbody>

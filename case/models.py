@@ -117,7 +117,6 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return balance
 
 
-
 class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     no = models.CharField(max_length=100)
     name = models.CharField(max_length=300, null=True, blank=True)
@@ -244,7 +243,10 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     @property
     def receipts_iter(self):
-        return itertools.chain.from_iterable(rv.receipts_set.all() for rv in self.receivable_set.all())
+        # 因为这个iter要多次使用
+        # 所以不能设置为cached_property
+        # 注意要使用filter enabled=1
+        return itertools.chain.from_iterable(rv.receipts_set.filter(enabled=1).all() for rv in self.receivable_set.all())
 
     @cached_property
     def receipts_sum_cny(self):
@@ -254,9 +256,10 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     @property
     def payment_iter(self):
-        # 以为这个iter要多次使用
+        # 因为这个iter要多次使用
         # 所以不能设置为cached_property
-        return itertools.chain.from_iterable(pa.payment_set.all() for pa in self.payable_set.all())
+        # 注意要使用filter enabled=1
+        return itertools.chain.from_iterable(pa.payment_set.filter(enabled=1).all() for pa in self.payable_set.all())
 
     @cached_property
     def payment_sum_cny(self):
@@ -266,5 +269,6 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     @cached_property
     def expense_sum_cny(self):
-        return sum(expense.amount_cny for expense in self.expense_set.all())
+        # 注意要使用filter enabled=1
+        return sum(expense.amount_cny for expense in self.expense_set.filter(enabled=1).all())
 
