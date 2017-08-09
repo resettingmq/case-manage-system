@@ -29,6 +29,7 @@ class CaseRelatedEntityView(RelatedEntityView):
     form_class = forms.CaseModelForm
     pk_url_kwarg = 'case_id'
     template_name = 'case/case_detail.html'
+    main_entity_extra_action = ['show_balance']
 
 
 class CaseCreateView(ConfiguredModelFormMixin, generic.CreateView):

@@ -9,26 +9,11 @@
 {% endblock content-title %}
 
 {% block content_tab %}
-    {% if not view.is_related or view.action == 'create' %}
+    {% if not view.is_related and view.action is None or view.action == 'create' %}
         {% render_form %}
-    {% else %}
+    {% elif view.is_related%}
         {% render_table dt_config %}
-    {% endif %}
-{% endblock %}
-
-{% block addtional_tab %}
-    {% if not view.is_related %}
-    <li>
-        <a href="#balance-pane" data-toggle="tab">
-            收支信息
-        </a>
-    </li>
-    {% endif %}
-{% endblock addtional_tab %}
-
-{% block addtional_tabpane %}
-    {% if not view.is_related %}
-    <div class="tab-pane" id="balance-pane">
+    {% else %}
         <div class="row">
             <div class="col-xs-12 table-responsive">
                 <table class="table table-hover" style="text-align: right;">
@@ -219,9 +204,18 @@
                 </table>
             </div>
         </div>
-    </div>
     {% endif %}
-{% endblock addtional_tabpane %}
+{% endblock %}
+
+{% block addtional_tab %}
+    {% if not view.is_related %}
+    <li>
+        <a href="?action=show_balance">
+            收支信息
+        </a>
+    </li>
+    {% endif %}
+{% endblock addtional_tab %}
 
 {% block javascript %}
     {% if view.is_related and view.action == 'list' %}
