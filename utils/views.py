@@ -334,6 +334,8 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
     detail_info = {'title': 'name'}
     # 用于指定delete(disable)页面url
     delete_url = None
+    # 用于指定main entity支持的额外action
+    main_entity_extra_action = []
 
     def is_related(self):
         return self.model is not self.main_entity
@@ -350,6 +352,9 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             try:
                 # del self.request.session['current_entity_name']
                 del self.request.session[self.main_entity_name]
+            except KeyError:
+                pass
+            try:
                 del self.request.session['action']
             except KeyError:
                 pass
@@ -389,8 +394,14 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             # self.current_entity_name和self.action为None
             # 如果不这样做，在某些场景下会出现related_entity不存在的情况，即使是按main_model为key来存储related_entity
             # 例如某些client(agent)对应agent subcase，某些client(非agent)不对应angent subcase
+            action = self.request.session.get('action', None)
+            if action in self.main_entity_extra_action:
+                # 增加这部分，使得能够在main entity上支持其它的action
+                # 便于扩展
+                self.action = action
             return True
         try:
+            # 尝试更改当前view的model context
             self.model = apps.get_model(current_entity_name)
             self.current_entity_name = current_entity_name
             self.action = self.request.session.get('action', None)
@@ -625,11 +636,10 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
                 url = None
         return url
 
-
-class RelatedEntityView(FormMessageMixin, RelatedEntityConstructMixin, generic.UpdateView):
-    def get(self, request, *args, **kwargs):
-        if self.construct_related_entity():
-            return HttpResponseRedirect(request.path_info)
+    def handle_get(self, request, *args, **kwargs):
+        # 处理重定向后的get请求
+        # 增加这个方法的目的是在子类中可以重写这个方法
+        # 便于扩展
         if self.is_related():
             if self.action == 'create':
                 # 还需要设置self.initial等属性
@@ -652,8 +662,7 @@ class RelatedEntityView(FormMessageMixin, RelatedEntityConstructMixin, generic.U
             self.object = self.get_object()
             return self.render_to_response(self.get_context_data(dt_config=None))
 
-    def post(self, request, *args, **kwargs):
-        self.construct_related_entity()
+    def handle_post(self, request, *args, **kwargs):
         if not self.is_related() or self.action == 'create':
             if self.is_related():
                 self.object = None
@@ -674,6 +683,17 @@ class RelatedEntityView(FormMessageMixin, RelatedEntityConstructMixin, generic.U
             return super().post(request, *args, **kwargs)
         else:
             return self.get(request, *args, **kwargs)
+
+
+class RelatedEntityView(FormMessageMixin, RelatedEntityConstructMixin, generic.UpdateView):
+    def get(self, request, *args, **kwargs):
+        if self.construct_related_entity():
+            return HttpResponseRedirect(request.path_info)
+        return self.handle_get(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        self.construct_related_entity()
+        return self.handle_post(request, *args, **kwargs)
 
 
 class DisablementMixin:

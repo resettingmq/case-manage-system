@@ -66,8 +66,8 @@
                 </a>
             </li>
             {% else %}
-                <li class="active">
-                <a href="?current=">详细信息</a>
+                <li {% if view.action is None %}class="active"{% endif %}>
+                <a href="?clear">详细信息</a>
             </li>
             {% endif %}
 
