@@ -1,7 +1,11 @@
 import os
+import itertools
+from collections import OrderedDict
+
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
 from base.models import Client, Country, Owner
@@ -99,9 +103,19 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return detail_info
 
     @classmethod
-    def get_related_entity_config(self):
-        if self.related_entity_config is not None:
-            return self.related_entity_config
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    @cached_property
+    def balance_amount_cny(self):
+        balance = sum(
+            subcase.receipts_sum_cny - (subcase.payment_sum_cny + subcase.expense_sum_cny)
+            for subcase in self.subcase_set.all()
+        )
+
+        return balance
+
 
 
 class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
@@ -227,3 +241,30 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         detail_info['enabled'] = self.enabled
 
         return detail_info
+
+    @property
+    def receipts_iter(self):
+        return itertools.chain.from_iterable(rv.receipts_set.all() for rv in self.receivable_set.all())
+
+    @cached_property
+    def receipts_sum_cny(self):
+        # 所有关联receipts的总金额
+        # 减去transfer_charge
+        return sum(rv.amount_cny - rv.transfer_charge.amount for rv in self.receipts_iter)
+
+    @property
+    def payment_iter(self):
+        # 以为这个iter要多次使用
+        # 所以不能设置为cached_property
+        return itertools.chain.from_iterable(pa.payment_set.all() for pa in self.payable_set.all())
+
+    @cached_property
+    def payment_sum_cny(self):
+        # 所有关联payment的总金额
+        # 包含transfer_charge
+        return sum(pm.amount_cny + pm.transfer_charge.amount for pm in self.payment_iter)
+
+    @cached_property
+    def expense_sum_cny(self):
+        return sum(expense.amount_cny for expense in self.expense_set.all())
+

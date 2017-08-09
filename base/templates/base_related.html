@@ -70,12 +70,17 @@
                 <a href="?current=">详细信息</a>
             </li>
             {% endif %}
+
+            {% block addtional_tab %}
+            {% endblock addtional_tab %}
         </ul>
         <div class="tab-content">
             <div class="tab-pane active" id="content_tab">
                 {% block content_tab %}
                 {% endblock content_tab %}
             </div>
+            {% block addtional_tabpane %}
+            {% endblock addtional_tabpane %}
         </div>
     </div><!-- /.nav-tabs-custom -->
 </div><!-- /.col-md-9 -->

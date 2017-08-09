@@ -3,6 +3,7 @@ from collections import OrderedDict
 
 from django.db import models
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, EnabledEntityManager
 
@@ -86,7 +87,7 @@ class Payable(CommonFieldMixin, DescriptionFieldMixin):
 
 class Payment(CommonFieldMixin, DescriptionFieldMixin):
     amount = models.DecimalField('已付款金额', max_digits=10, decimal_places=2)
-    exchange_rate = models.DecimalField('付款汇率', max_digits=8, decimal_places=2)
+    exchange_rate = models.DecimalField('付款汇率', max_digits=8, decimal_places=4)
     paid_date = models.DateField('付款日期')
 
     currency = models.ForeignKey(
@@ -145,3 +146,10 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
         detail_info['enabled'] = self.enabled
 
         return detail_info
+
+    @cached_property
+    def amount_cny(self):
+        if self.currency_id == 'CNY':
+            return self.amount
+        else:
+            return self.amount * self.exchange_rate

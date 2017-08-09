@@ -5,6 +5,7 @@ from collections import OrderedDict
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
 
@@ -31,8 +32,8 @@ class Expense(CommonFieldMixin, DescriptionFieldMixin):
     amount = models.DecimalField('支出金额', max_digits=10, decimal_places=2)
     exchange_rate = models.DecimalField(
         '汇率',
-        max_digits=10,
-        decimal_places=2,
+        max_digits=8,
+        decimal_places=4,
         default=Decimal('1'),
     )
     incurred_date = models.DateField('支出日期', null=True, blank=True)
@@ -126,3 +127,10 @@ class Expense(CommonFieldMixin, DescriptionFieldMixin):
         detail_info['enabled'] = self.enabled
 
         return detail_info
+
+    @cached_property
+    def amount_cny(self):
+        if self.currency_id == 'CNY':
+            return self.amount
+        else:
+            return self.amount * self.exchange_rate

@@ -4,6 +4,7 @@ from decimal import Decimal
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.utils.functional import cached_property
 
 from base.models import CommonFieldMixin, DescriptionFieldMixin, FakerMixin, EnabledEntityManager
 
@@ -156,3 +157,10 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
         detail_info['enabled'] = self.enabled
 
         return detail_info
+
+    @cached_property
+    def amount_cny(self):
+        if self.currency_id == 'CNY':
+            return self.amount
+        else:
+            return self.amount * self.exchange_rate
