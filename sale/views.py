@@ -69,3 +69,10 @@ class ReceiptsCreateView(ConfiguredModelFormMixin, generic.CreateView):
 class ReceiptsDisableView(DisablementView):
     model = models.Receipts
     pk_url_kwarg = 'receipts_id'
+
+    def disable(self):
+        # 在禁用Receipts之前，需要禁用关联的Expense
+        if self.object.transfer_charge:
+            self.object.transfer_charge.enabled = False
+            self.object.transfer_charge.save()
+        super().disable()
