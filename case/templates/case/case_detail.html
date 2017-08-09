@@ -133,10 +133,39 @@
                         </tr>
 
                         <tr style="text-align: left;">
-                            <th colspan="5">
+                            <th colspan="4">
                                 <span style="margin-left: 50px;"><i>其它收入</i></span>
                             </th>
+                            <th style="font-size: 16px; text-align: right;">
+                                <span style="color: #d33724;">
+                                    <b>&#65509;{{ subcase.income_sum_cny|floatformat:2 }}</b>
+                                </span>
+                            </th>
                         </tr>
+                        {% for income in subcase.income_set.all %}
+                        {% if income.enabled %}
+                        <tr>
+                            <td>
+                                <span style="margin-right: 50px;"><i>{{ income.income_type.name }}</i></span>
+                            </td>
+                            <td>
+                                <span class="label label-primary">
+                                    {{ income.currency_id }}
+                                </span>
+                            </td>
+                            <td>
+                                 <span style="color: #d33724;">{{ income.amount }}</span>
+                            </td>
+                            <td>
+                                <i>{{ income.exchange_rate }}</i>
+                            </td>
+                            <td>
+                                &#65509;
+                                <span style="color: #d33724;">{{ income.amount_cny|floatformat:2 }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
 
                         <tr>
                             <th colspan="4">
