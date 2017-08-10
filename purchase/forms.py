@@ -4,6 +4,7 @@ from decimal import Decimal
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.db.models import Q
 
 from . import models
 from base import models as base_models
@@ -93,3 +94,35 @@ class PaymentModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
         # 2. 将expense_type_id设置为100（汇款手续费）
         self['transfer_charge'].inner_form.instance.incurred_date = self.instance.paid_date
         self['transfer_charge'].inner_form.instance.expense_type_id = 100
+
+
+class PaymentLinkModelForm(forms.ModelForm):
+    class Meta:
+        model = models.PaymentLink
+        fields = ['amount', 'payment', 'subcase', 'desc']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['payment'].queryset = models.Payment.enabled_objects
+        self.fields['subcase'].queryset = case_models.SubCase.enabled_objects
+
+        payment = getattr(self.instance, 'payment', None)
+        if payment is not None:
+            # 用于在subcase queryset中去除payment关联的subcase
+            # 即不能将payment转移到自己所属的subcase
+            self.fields['subcase'].queryset = \
+                self.fields['subcase'].queryset.filter(~Q(pk=payment.payable.subcase_id))
+
+    def clean(self):
+        """
+        : 用于保证amount与关联payment的关系
+        : 因为希望直接使用cleaned_data['payment']，
+        : 所以是在clean()中实现而不是在clean_amount()中
+        : 带来一个影响就是抛出的ValidationError不能关联到特定field
+        :return: None if no ValidationError
+        """
+        old_amount = self.instance.amount or Decimal()
+        new_amount = self.cleaned_data['amount']
+        limit = self.cleaned_data['payment'].unlinked_amount
+        if new_amount - old_amount > limit:
+            raise ValidationError('转移付款金额不能大于关联已付款金额')

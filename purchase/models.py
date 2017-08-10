@@ -108,7 +108,12 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
 
     modelform_class = 'purchase.forms.PaymentModelForm'
     datatables_class = 'purchase.datatables.PaymentDataTable'
-    related_entity_config = {}
+    related_entity_config = {
+        'purchase.paymentlink': {
+            'query_path': 'payment',
+            'verbose_name': '转移'
+        }
+    }
 
     class Meta:
         verbose_name = '已付款项'
@@ -139,7 +144,9 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
         desc['付款汇率'] = self.exchange_rate or '未设置'
         desc['货币'] = self.currency.name_chs
         desc['付款日期'] = self.paid_date or '未指定'
-        desc['手续费'] = self.transfer_charge or '未指定'
+        desc['手续费(人民币)'] = self.transfer_charge.amount or '未指定'
+        desc['已转移金额'] = self.linked_amount
+        desc['未转移金额'] = self.unlinked_amount
         desc['所属待付账单'] = getattr(self.payable, 'name', '未指定编号')
 
         detail_info['desc'] = desc
@@ -153,3 +160,81 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
             return self.amount
         else:
             return self.amount * self.exchange_rate
+
+    @cached_property
+    def linked_amount(self):
+        return sum(link.amount for link in self.paymentlink_set.filter(enabled=1).all())
+
+    @cached_property
+    def unlinked_amount(self):
+        return self.amount - self.linked_amount
+
+    @cached_property
+    def unlinked_amount_cny(self):
+        return self.unlinked_amount * self.exchange_rate
+
+
+class PaymentLink(CommonFieldMixin, DescriptionFieldMixin):
+    amount = models.DecimalField('转移金额', max_digits=10, decimal_places=2)
+
+    payment = models.ForeignKey(
+        Payment,
+        verbose_name='已付账单',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    subcase = models.ForeignKey(
+        'case.SubCase',
+        verbose_name='转移目标(分案件)',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'purchase.forms.PaymentLinkModelForm'
+    datatables_class = 'purchase.datatables.PaymentLinkDataTable'
+    related_entity_config = {}
+
+    class Meta:
+        verbose_name = '已付款转移'
+        verbose_name_plural = '已付款转移'
+
+    def __str__(self):
+        return '转移已付款项: {}'.format(self.amount)
+
+    def get_absolute_url(self):
+        return reverse('paymentlink:detail', kwargs={'paymentlink_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('paymentlink:disable', kwargs={'paymentlink_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('paymentlink:detail', kwargs={'paymentlink_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = '金额：{}'.format(self.amount)
+        detail_info['sub_title'] = ''
+        desc['关联已付款金额'] = self.payment.amount
+        desc['关联已付款货币'] = self.payment.currency.name_chs
+        desc['关联分案'] = '<a>{}</a>'.format(self.subcase.name)
+
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info
+
+    @cached_property
+    def amount_cny(self):
+        if self.payment.currency_id == 'CNY':
+            return self.amount
+        else:
+            return self.amount * self.payment.exchange_rate

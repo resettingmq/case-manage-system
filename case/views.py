@@ -76,4 +76,10 @@ class SubCaseDisableView(DisablementView):
                 '不能删除该分案件：该分案件具有关联的其它支出',
                 code='invalid',
             )
+        # 判断是否有关联的PaymentLink存在
+        if any(p.enabled for p in self.object.paymentlink_set.all()):
+            raise ValidationError(
+                '不能删除该已付款项：该已付款项具有关联的转移已付款项',
+                code='invalid'
+            )
         super().validate()

@@ -19,3 +19,11 @@ class PaymentDataTable(ModelDataTable):
         fields = ['amount', 'currency__name_chs', 'exchange_rate',
                   'paid_date', 'payable__no']
         detail_url_format = '/payment/{}'
+
+
+class PaymentLinkDataTable(ModelDataTable):
+    class Meta:
+        model = models.PaymentLink
+        fields = ['amount', 'payment__currency_id', 'payment__amount',
+                  'subcase__name']
+        detail_url_format = '/paymentlink/{}'

@@ -111,8 +111,8 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def balance_amount_cny(self):
         balance = sum(
             subcase.receipts_sum_cny + subcase.income_sum_cny
-            - (subcase.payment_sum_cny + subcase.expense_sum_cny)
-            for subcase in self.subcase_set.all()
+            - (subcase.payment_sum_cny + subcase.expense_sum_cny + subcase.paymentlink_sum_cny)
+            for subcase in self.subcase_set.filter(enabled=1).all()
         )
 
         return balance
@@ -270,7 +270,13 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def payment_sum_cny(self):
         # 所有关联payment的总金额
         # 包含transfer_charge
-        return sum(pm.amount_cny + pm.transfer_charge.amount for pm in self.payment_iter)
+        # 注意使用的是unlinked_amount_cny，表示当前payment未被转移的金额(CNY)
+        return sum(pm.unlinked_amount_cny + pm.transfer_charge.amount for pm in self.payment_iter)
+
+    @cached_property
+    def paymentlink_sum_cny(self):
+        # 注意要使用filter enabled=1
+        return sum(plink.amount_cny for plink in self.paymentlink_set.filter(enabled=1).all())
 
     @cached_property
     def income_sum_cny(self):
@@ -281,4 +287,3 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def expense_sum_cny(self):
         # 注意要使用filter enabled=1
         return sum(expense.amount_cny for expense in self.expense_set.filter(enabled=1).all())
-

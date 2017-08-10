@@ -34,7 +34,7 @@ class PayableDisableView(DisablementView):
                 '不能删除该应付款项：该应付款项具有关联的已付款项',
                 code='invalid'
             )
-            super().validate()
+        super().validate()
 
 
 class PaymentListView(DataTablesListView):
@@ -64,3 +64,34 @@ class PaymentDisableView(DisablementView):
             self.object.transfer_charge.enabled = False
             self.object.transfer_charge.save()
         super().disable()
+
+    def validate(self):
+        # 判断是否有关联的PaymentLink存在
+        if any(p.enabled for p in self.object.paymentlink_set.all()):
+            raise ValidationError(
+                '不能删除该已付款项：该已付款项具有关联的转移已付款项',
+                code='invalid'
+            )
+        super().validate()
+
+
+class PaymentLinkListView(DataTablesListView):
+    dt_config = datatables.PaymentLinkDataTable
+    model = models.PaymentLink
+    template_name = 'purchase/payment_link_list.html'
+
+
+class PaymentLinkRelatedEntityView(RelatedEntityView):
+    model = models.PaymentLink
+    pk_url_kwarg = 'paymentlink_id'
+    template_name = 'purchase/payment_link_detail.html'
+
+
+class PaymentLinkCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
+    model = models.PaymentLink
+    template_name = 'purchase/payment_link_create.html'
+
+
+class PaymentLinkDisableView(DisablementView):
+    model = models.PaymentLink
+    pk_url_kwarg = 'paymentlink_id'

@@ -78,21 +78,27 @@
 
                         {% for pm in subcase.payment_iter %}
                         <tr>
-                            <td></td>
+                            <td>
+                                {% if pm.linked_amount > 0.0 %}
+                                    <i>已转移: {{ pm.linked_amount }}</i>
+                                {% endif %}
+                            </td>
                             <td>
                                 <span class="label label-primary">
                                     {{ pm.currency_id }}
                                 </span>
                             </td>
                             <td>
-                                 <span style="color: #00a65a;">{{ pm.amount }}</span>
+                                {# 注意这里需要使用unlinked_amount属性 #}
+                                <span style="color: #00a65a;">{{ pm.unlinked_amount }}</span>
                             </td>
                             <td>
                                 <i>{{ pm.exchange_rate }}</i>
                             </td>
                             <td>
                                 &#65509;
-                                <span style="color: #00a65a;"><b>-</b>{{ pm.amount_cny|floatformat:2 }}</span>
+                                {# 注意这里需要使用unlinked_amount_cny属性 #}
+                                <span style="color: #00a65a;"><b>-</b>{{ pm.unlinked_amount_cny|floatformat:2 }}</span>
                             </td>
                         </tr>
                         <tr>
@@ -116,6 +122,46 @@
                                 </span>
                             </td>
                         </tr>
+
+                        <tr>
+                            <th colspan="4">
+                                <span style="margin-left: 50px;"><i>其它已付款项(转移)</i></span>
+                            </th>
+                            <th style="font-size: 16px; text-align: right;">
+                                <span style="color: #00a65a;">
+                                    <b>&#65509;-{{ subcase.paymentlink_sum_cny|floatformat:2 }}</b>
+                                </span>
+                            </th>
+                        </tr>
+                        {% for plink in subcase.paymentlink_set.all %}
+                        {% if plink.enabled %}
+                        <tr>
+                            <td>
+                                <span style="margin-right: 50px;">
+                                    <i>
+                                        {{ plink.payment.payable.subcase.case.name }}-
+                                        {{ plink.payment.payable.subcase.name }}
+                                    </i>
+                                </span>
+                            </td>
+                            <td>
+                                <span class="label label-primary">
+                                    {{ plink.payment.currency_id }}
+                                </span>
+                            </td>
+                            <td>
+                                 <span style="color: #00a65a;">{{ plink.amount }}</span>
+                            </td>
+                            <td>
+                                <i>{{ plink.payment.exchange_rate }}</i>
+                            </td>
+                            <td>
+                                &#65509;
+                                <span style="color: #00a65a;"><b>-</b>{{ plink.amount_cny|floatformat:2 }}</span>
+                            </td>
+                        </tr>
+                        {% endif %}
+                        {% endfor %}
 
                         <tr style="text-align: left;">
                             <th colspan="4">
