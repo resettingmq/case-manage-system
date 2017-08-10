@@ -77,18 +77,24 @@ class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     model = models.SubCase
     template_name = 'case/subcase_create.html'
 
-    def get_form(self, form_class=None):
-        # 需要修改生成form，以限制agent的choice范围
-        form = super().get_form(form_class)
-        form.fields['agent'].queryset = form.fields['agent'].queryset.filter(is_agent=True)
-        return form
-
 
 class SubCaseDisableView(DisablementView):
     model = models.SubCase
     pk_url_kwarg = 'subcase_id'
 
     def validate(self):
+        if any(rv.enabled for rv in self.object.receivable_set.all()):
+            raise ValidationError(
+                '不能删除该分案件：该分案件具有关联的待收款项',
+                code='invalid',
+            )
+
+        if any(pa.enabled for pa in self.object.payable_set.all()):
+            raise ValidationError(
+                '不能删除该分案件：该分案件具有关联的待付款项',
+                code='invalid',
+            )
+
         if any(expense.enabled for expense in self.object.expense_set.all()):
             raise ValidationError(
                 '不能删除该分案件：该分案件具有关联的其它支出',
