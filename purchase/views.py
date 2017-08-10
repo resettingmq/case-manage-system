@@ -31,7 +31,7 @@ class PayableDisableView(DisablementView):
     def validate(self):
         if any(p.enabled for p in self.object.payment_set.all()):
             raise ValidationError(
-                '不能删除该应付款项：该应付款项具有关联的已付款项',
+                '不能删除该待付款项：该应付款项具有关联的已付款项',
                 code='invalid'
             )
         super().validate()
@@ -47,6 +47,16 @@ class PaymentRelatedEntityView(RelatedEntityView):
     model = models.Payment
     pk_url_kwarg = 'payment_id'
     template_name = 'purchase/payment_detail.html'
+
+    def get_form(self):
+        """
+        : 为了简化保证数据完整性的业务逻辑，这里要求payable不能更改
+        :return: form instance
+        """
+        form = super().get_form()
+        if not self.is_related():
+            form.fields['payable'].disabled = True
+        return form
 
 
 class PaymentCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):

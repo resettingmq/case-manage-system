@@ -9,7 +9,7 @@ from base.models import CommonFieldMixin, DescriptionFieldMixin, EnabledEntityMa
 
 
 class Payable(CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField('应付款账单编号', max_length=100)
+    no = models.CharField('待付款账单编号', max_length=100)
     received_date = models.DateField('账单收到日期')
     due_date = models.DateField('付款期限')
     amount = models.DecimalField('账单总金额', max_digits=10, decimal_places=2)
@@ -48,8 +48,8 @@ class Payable(CommonFieldMixin, DescriptionFieldMixin):
     }
 
     class Meta:
-        verbose_name = '应付款项'
-        verbose_name_plural = '应付款项'
+        verbose_name = '待付款项'
+        verbose_name_plural = '待付款项'
 
     def __str__(self):
         return '{}-{}{}'.format(self.no, self.currency_id, self.amount)
@@ -72,13 +72,19 @@ class Payable(CommonFieldMixin, DescriptionFieldMixin):
         detail_info = {}
         desc = OrderedDict()
         detail_info['title'] = self.no or '未指定编号'
-        detail_info['sub_title'] = getattr(self.subcase, 'name', '')
-        desc['所属案件'] = self.subcase.case.name
+        detail_info['sub_title'] = '<a href="{}">{}</a>'.format(
+            reverse('subcase:detail', kwargs={'subcase_id': self.subcase_id}),
+            self.subcase.name
+        )
+        desc['所属案件'] = '<a href="{}">{}</a>'.format(
+            reverse('case:detail', kwargs={'case_id': self.subcase.case_id}),
+            self.subcase.case.name
+        )
         desc['金额'] = self.amount
-        desc['未收金额'] = self.unsettled_amount
+        desc['未付金额'] = self.unsettled_amount
         desc['货币'] = self.currency.name_chs
-        desc['期限'] = self.due_date or '未指定'
-        desc['发送日期'] = self.received_date or '未指定'
+        desc['付款期限'] = self.due_date or '未指定'
+        desc['账单收到日期'] = self.received_date or '未指定'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
@@ -92,7 +98,7 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
 
     currency = models.ForeignKey(
         'base.Currency',
-        verbose_name='货币',
+        verbose_name='付款货币',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -150,6 +156,14 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
         desc['所属待付账单'] = '<a href="{}">{}</a>'.format(
             reverse('payable:detail', kwargs={'payable_id': self.payable_id}),
             self.payable.no
+        )
+        desc['所属分案'] = '<a href="{}">{}</a>'.format(
+            reverse('subcase:detail', kwargs={'subcase_id': self.payable.subcase_id}),
+            self.payable.subcase.name
+        )
+        desc['所属案件'] = '<a href="{}">{}</a>'.format(
+            reverse('case:detail', kwargs={'case_id': self.payable.subcase.case_id}),
+            self.payable.subcase.case.name
         )
 
         detail_info['desc'] = desc
