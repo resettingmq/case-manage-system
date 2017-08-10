@@ -32,3 +32,11 @@ class CaseModelForm(ModelFormFieldSupportMixin, ModelForm):
         model = models.Case
         fields = ['name', 'archive_no', 'closed', 'client', 'owner',
                   'category', 'stage', 'entry_country', 'desc']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if hasattr(self.instance, 'application'):
+            # 根据application的enabled状态
+            # 设置formfield的disabled状态
+            if not self.instance.application.enabled:
+                self.fields['application'].disabled = True
