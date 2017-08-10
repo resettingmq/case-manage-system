@@ -33,5 +33,5 @@ $.fn.dataTable.ext.buttons.cms_colvis = {
 }
 
 $(document).ready(function() {
-
+    $("select").select2();
 });
