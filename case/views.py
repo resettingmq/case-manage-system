@@ -71,7 +71,7 @@ class SubCaseDisableView(DisablementView):
     pk_url_kwarg = 'subcase_id'
 
     def validate(self):
-        if len(self.object.expense_set.all()) != 0:
+        if any(expense.enabled for expense in self.object.expense_set.all()):
             raise ValidationError(
                 '不能删除该分案件：该分案件具有关联的其它支出',
                 code='invalid',
