@@ -1,4 +1,5 @@
 import os
+from collections import OrderedDict
 
 from django.db import models
 from django.db.models.signals import post_save
@@ -59,7 +60,7 @@ class CommonFieldMixin(models.Model):
 
 
 class DescriptionFieldMixin(models.Model):
-    desc = models.TextField(null=True, blank=True)
+    desc = models.TextField('备注', null=True, blank=True)
 
     class Meta:
         abstract = True
@@ -194,22 +195,34 @@ class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
 
 class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    name = models.CharField(max_length=100)
-    is_agent = models.BooleanField(default=False)
-    tel = models.CharField(max_length=30, null=True, blank=True)
-    mobile = models.CharField(max_length=30, null=True, blank=True)
-    fax = models.CharField(max_length=30, null=True, blank=True)
-    state = models.CharField(max_length=100, null=True, blank=True)
-    city = models.CharField(max_length=100, null=True, blank=True)
-    address = models.CharField(max_length=200, null=True, blank=True)
-    postal_code = models.CharField(max_length=20, null=True, blank=True)
+    name = models.CharField('客户名称', max_length=100)
+    is_agent = models.BooleanField('是否代理', default=False)
+    tel = models.CharField('电话', max_length=30, null=True, blank=True)
+    mobile = models.CharField('移动电话', max_length=30, null=True, blank=True)
+    fax = models.CharField('传真', max_length=30, null=True, blank=True)
+    state = models.CharField('省/地区', max_length=100, null=True, blank=True)
+    city = models.CharField('城市', max_length=100, null=True, blank=True)
+    address = models.CharField('地址', max_length=200, null=True, blank=True)
+    postal_code = models.CharField('邮编', max_length=20, null=True, blank=True)
 
-    currency = models.ForeignKey(Currency, null=True, blank=True)
-    country = models.ForeignKey(Country, null=True, blank=True)
+    currency = models.ForeignKey(
+        Currency,
+        verbose_name='常用货币',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    country = models.ForeignKey(
+        Country,
+        verbose_name='所在国家',
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
 
+    modelform_class = 'base.forms.ClientModelForm'
+    datatables_class = 'base.datatables.ClientDataTable'
     related_entity_config = {
         'case.case': {
             'query_path': 'client',
@@ -236,6 +249,10 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'country': 'base.models.Country',
     }
 
+    class Meta:
+        verbose_name = '客户/代理'
+        verbose_name_plural = '客户/代理'
+
     def __str__(self):
         return '{c.name}'.format(c=self)
 
@@ -248,19 +265,20 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def get_deletion_success_url(self):
         return reverse('client:detail', kwargs={'client_id': self.id})
 
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
     def get_detail_info(self):
         detail_info = {}
-        desc = {}
+        desc = OrderedDict()
         detail_info['title'] = self.name
         detail_info['sub_title'] = self.country.name_chs
-        desc['电话'] = self.tel
-        desc['地址'] = self.address
+        desc['电话'] = self.tel or '没有设置'
+        desc['移动电话'] = self.mobile or '没有设置'
+        desc['传真'] = self.fax or '没有设置'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
         return detail_info
-
-    @classmethod
-    def get_related_entity_config(self):
-        if self.related_entity_config is not None:
-            return self.related_entity_config

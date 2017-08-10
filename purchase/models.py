@@ -147,7 +147,10 @@ class Payment(CommonFieldMixin, DescriptionFieldMixin):
         desc['手续费(人民币)'] = self.transfer_charge.amount or '未指定'
         desc['已转移金额'] = self.linked_amount
         desc['未转移金额'] = self.unlinked_amount
-        desc['所属待付账单'] = getattr(self.payable, 'name', '未指定编号')
+        desc['所属待付账单'] = '<a href="{}">{}</a>'.format(
+            reverse('payable:detail', kwargs={'payable_id': self.payable_id}),
+            self.payable.no
+        )
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
@@ -223,9 +226,15 @@ class PaymentLink(CommonFieldMixin, DescriptionFieldMixin):
         desc = OrderedDict()
         detail_info['title'] = '金额：{}'.format(self.amount)
         detail_info['sub_title'] = ''
-        desc['关联已付款金额'] = self.payment.amount
+        desc['关联已付款金额'] = '<a href="{}">{}</a>'.format(
+            reverse('payment:detail', kwargs={'payment_id': self.payment_id}),
+            self.payment.amount
+        )
         desc['关联已付款货币'] = self.payment.currency.name_chs
-        desc['关联分案'] = '<a>{}</a>'.format(self.subcase.name)
+        desc['关联分案'] = '<a href="{}">{}</a>'.format(
+            reverse('subcase:detail', kwargs={'subcase_id': self.subcase_id}),
+            self.subcase.name
+        )
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
