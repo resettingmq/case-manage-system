@@ -138,6 +138,10 @@ class Continent(FakerMixin, CommonFieldMixin):
 
     data_path = os.path.join(BASE_DIR, 'data/continent.json')
 
+    class Meta:
+        verbose_name = '洲'
+        verbose_name_plural = '洲'
+
     def __str__(self):
         return '{c.id}-{c.name_chs}'.format(c=self)
 
@@ -161,7 +165,8 @@ class Country(FakerMixin, CommonFieldMixin):
     data_path = os.path.join(BASE_DIR, 'data/country.json')
 
     class Meta:
-        verbose_name_plural = 'countries'
+        verbose_name = '国家'
+        verbose_name_plural = '国家'
 
     def __str__(self):
         return '{c.id}-{c.name_en_short}-{c.name_chs}'.format(c=self)
@@ -179,7 +184,8 @@ class Currency(FakerMixin, CommonFieldMixin):
     data_path = os.path.join(BASE_DIR, 'data/currency.json')
 
     class Meta:
-        verbose_name_plural = 'currencies'
+        verbose_name = '货币'
+        verbose_name_plural = '货币'
 
     def __str__(self):
         return '{c.id}-{c.name_chs}-{c.name_en}'.format(c=self)
@@ -187,6 +193,13 @@ class Currency(FakerMixin, CommonFieldMixin):
 
 class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField('名称', max_length=100)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    class Meta:
+        verbose_name = '所属部门'
+        verbose_name_plural = '所属部门'
 
     data_path = os.path.join(BASE_DIR, 'data/owner.json')
 
