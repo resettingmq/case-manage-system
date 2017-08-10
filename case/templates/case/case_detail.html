@@ -255,7 +255,7 @@
 
 {% block addtional_tab %}
     {% if not view.is_related %}
-    <li>
+    <li {% if not view.is_related and view.action == 'show_balance' %}class="active"{% endif %}>
         <a href="?action=show_balance">
             收支信息
         </a>
