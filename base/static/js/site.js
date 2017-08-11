@@ -30,7 +30,9 @@ $.fn.dataTable.ext.buttons.show_disabled = {
 $.fn.dataTable.ext.buttons.cms_colvis = {
     extend: 'colvis',
     text: '选择显示列',
-}
+};
+
+$.fn.select2.defaults.set("theme", "bootstrap");
 
 $(document).ready(function() {
     $("select").select2();
