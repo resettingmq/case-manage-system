@@ -105,23 +105,28 @@ class Expense(CommonFieldMixin, DescriptionFieldMixin):
         desc = OrderedDict()
         detail_info['title'] = '金额：{}'.format(self.amount)
         detail_info['sub_title'] = self.expense_type.name
-        desc['汇率'] = self.exchange_rate or '未设置'
         desc['货币'] = self.currency.name_chs
+        desc['汇率'] = self.exchange_rate or '未设置'
         desc['日期'] = self.incurred_date or '未指定'
         if self.receipts:
-            desc['关联已收款项'] = '{}{}-{}'.format(
+            desc['关联已收款项'] = '<a href="{}">{} {}(<i>{}</i>)</a>'.format(
+                reverse('receipts:detail', kwargs={'receipts_id': self.receipts_id}),
                 self.receipts.currency_id,
                 self.receipts.amount,
                 self.receipts.received_date
             )
         if self.payment:
-            desc['关联已付款项'] = '{} {}-{}'.format(
+            desc['关联已付款项'] = '<a href="{}">{} {}(<i>{}</i>)</a>'.format(
+                reverse('payment:detail', kwargs={'payment_id': self.payment_id}),
                 self.payment.currency_id,
                 self.payment.amount,
                 self.payment.paid_date
             )
         if self.subcase:
-            desc['关联分案件'] = self.subcase.name
+            desc['关联分案件'] = '<a href="{}">{}</a>'.format(
+                reverse('subcase:detail', kwargs={'subcase_id': self.subcase_id}),
+                self.subcase.name
+            )
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled

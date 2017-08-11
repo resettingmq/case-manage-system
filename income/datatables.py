@@ -10,3 +10,4 @@ class IncomeDataTable(ModelDataTable):
         model = models.Income
         fields = ['amount', 'currency__name_chs', 'income_type__name',
                   'subcase__name']
+        detail_url_format = '/income/{}'

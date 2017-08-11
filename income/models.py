@@ -111,11 +111,14 @@ class Income(CommonFieldMixin, DescriptionFieldMixin):
         desc = OrderedDict()
         detail_info['title'] = '金额：{}'.format(self.amount)
         detail_info['sub_title'] = self.income_type.name
-        desc['汇率'] = self.exchange_rate or '未设置'
         desc['货币'] = self.currency.name_chs
+        desc['汇率'] = self.exchange_rate or '未设置'
         desc['日期'] = self.incurred_date or '未指定'
         if self.subcase:
-            desc['关联分案件'] = self.subcase.name
+            desc['关联分案件'] = '<a href="{}">{}</a>'.format(
+                reverse('subcase:detail', kwargs={'subcase_id': self.subcase_id}),
+                self.subcase.name
+            )
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
