@@ -77,13 +77,19 @@ class Receivable(CommonFieldMixin, DescriptionFieldMixin):
         detail_info = {}
         desc = OrderedDict()
         detail_info['title'] = self.no or '未指定编号'
-        detail_info['sub_title'] = getattr(self.subcase, 'name', '')
-        desc['所属案件'] = self.subcase.case.name
+        detail_info['sub_title'] = '<a href="{}">{}</a>'.format(
+            reverse('subcase:detail', kwargs={'subcase_id': self.subcase_id}),
+            self.subcase.name
+        )
+        desc['所属案件'] = '<a href="{}">{}</a>'.format(
+            reverse('case:detail', kwargs={'case_id': self.subcase.case_id}),
+            self.subcase.case.name
+        )
         desc['金额'] = self.amount
         desc['未收金额'] = self.unsettled_amount
         desc['货币'] = self.currency.name_chs
-        desc['期限'] = self.due_date or '未指定'
-        desc['发送日期'] = self.sent_date or '未指定'
+        desc['收款期限'] = self.due_date or '未指定'
+        desc['账单发送日期'] = self.sent_date or '未指定'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
@@ -103,7 +109,7 @@ class Receipts(CommonFieldMixin, DescriptionFieldMixin):
     )
     receivable = models.ForeignKey(
         Receivable,
-        verbose_name='收款账单',
+        verbose_name='待收款账单',
         on_delete=models.SET_NULL,
         null=True
     )

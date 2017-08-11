@@ -11,3 +11,7 @@
 .btn-datatables.activate i:before {
   content: "\f373";
 }
+
+.table-dt tbody tr{
+  cursor: pointer;
+}

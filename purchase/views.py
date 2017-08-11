@@ -31,10 +31,10 @@ class PayableDisableView(DisablementView):
     def validate(self):
         if any(p.enabled for p in self.object.payment_set.all()):
             raise ValidationError(
-                '不能删除该应付款项：该应付款项具有关联的已付款项',
+                '不能删除该待付款项：该应付款项具有关联的已付款项',
                 code='invalid'
             )
-            super().validate()
+        super().validate()
 
 
 class PaymentListView(DataTablesListView):
@@ -47,6 +47,16 @@ class PaymentRelatedEntityView(RelatedEntityView):
     model = models.Payment
     pk_url_kwarg = 'payment_id'
     template_name = 'purchase/payment_detail.html'
+
+    def get_form(self):
+        """
+        : 为了简化保证数据完整性的业务逻辑，这里要求payable不能更改
+        :return: form instance
+        """
+        form = super().get_form()
+        if not self.is_related():
+            form.fields['payable'].disabled = True
+        return form
 
 
 class PaymentCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
@@ -64,3 +74,34 @@ class PaymentDisableView(DisablementView):
             self.object.transfer_charge.enabled = False
             self.object.transfer_charge.save()
         super().disable()
+
+    def validate(self):
+        # 判断是否有关联的PaymentLink存在
+        if any(p.enabled for p in self.object.paymentlink_set.all()):
+            raise ValidationError(
+                '不能删除该已付款项：该已付款项具有关联的转移已付款项',
+                code='invalid'
+            )
+        super().validate()
+
+
+class PaymentLinkListView(DataTablesListView):
+    dt_config = datatables.PaymentLinkDataTable
+    model = models.PaymentLink
+    template_name = 'purchase/payment_link_list.html'
+
+
+class PaymentLinkRelatedEntityView(RelatedEntityView):
+    model = models.PaymentLink
+    pk_url_kwarg = 'paymentlink_id'
+    template_name = 'purchase/payment_link_detail.html'
+
+
+class PaymentLinkCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
+    model = models.PaymentLink
+    template_name = 'purchase/payment_link_create.html'
+
+
+class PaymentLinkDisableView(DisablementView):
+    model = models.PaymentLink
+    pk_url_kwarg = 'paymentlink_id'

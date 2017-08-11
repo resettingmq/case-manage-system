@@ -33,7 +33,7 @@ class ReceivableDisableView(DisablementView):
     def validate(self):
         if any(rt.enabled for rt in self.object.receipts_set.all()):
             raise ValidationError(
-                '不能删除该应收款项：该应收款项具有关联的已收款项',
+                '不能删除该待收款项：该应收款项具有关联的已收款项',
                 code='invalid'
             )
         super().validate()

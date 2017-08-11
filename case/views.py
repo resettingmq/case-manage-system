@@ -42,6 +42,24 @@ class CaseDisableView(DisablementView):
     model = models.Case
     pk_url_kwarg = 'case_id'
 
+    def validate(self):
+        if any(subcase.enabled for subcase in self.object.subcase_set.all()):
+            raise ValidationError(
+                '不能删除该案件：该客户具有关联的分案',
+                code='invalid'
+            )
+
+    def disable(self):
+        # 在disable case之前，
+        # 需要先disable相关联的application和contract
+        if self.object.application:
+            self.object.application.enabled = False
+            self.object.application.save()
+        if self.object.contract:
+            self.object.contract.enabled = False
+            self.object.contract.save()
+        super().disable()
+
 
 class SubCaseListView(DataTablesListView):
     dt_config = datatables.SubCaseDataTable
@@ -59,21 +77,33 @@ class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     model = models.SubCase
     template_name = 'case/subcase_create.html'
 
-    def get_form(self, form_class=None):
-        # 需要修改生成form，以限制agent的choice范围
-        form = super().get_form(form_class)
-        form.fields['agent'].queryset = form.fields['agent'].queryset.filter(is_agent=True)
-        return form
-
 
 class SubCaseDisableView(DisablementView):
     model = models.SubCase
     pk_url_kwarg = 'subcase_id'
 
     def validate(self):
-        if len(self.object.expense_set.all()) != 0:
+        if any(rv.enabled for rv in self.object.receivable_set.all()):
+            raise ValidationError(
+                '不能删除该分案件：该分案件具有关联的待收款项',
+                code='invalid',
+            )
+
+        if any(pa.enabled for pa in self.object.payable_set.all()):
+            raise ValidationError(
+                '不能删除该分案件：该分案件具有关联的待付款项',
+                code='invalid',
+            )
+
+        if any(expense.enabled for expense in self.object.expense_set.all()):
             raise ValidationError(
                 '不能删除该分案件：该分案件具有关联的其它支出',
                 code='invalid',
+            )
+        # 判断是否有关联的PaymentLink存在
+        if any(p.enabled for p in self.object.paymentlink_set.all()):
+            raise ValidationError(
+                '不能删除该已付款项：该已付款项具有关联的转移已付款项',
+                code='invalid'
             )
         super().validate()

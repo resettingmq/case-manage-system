@@ -82,7 +82,7 @@ class Income(CommonFieldMixin, DescriptionFieldMixin):
     enabled_objects = EnabledEntityManager()
 
     modelform_class = 'income.forms.IncomeModelForm'
-    datatables_class = 'income.datatables.IncomeDateTable'
+    datatables_class = 'income.datatables.IncomeDataTable'
     related_entity_config = {}
 
     class Meta:

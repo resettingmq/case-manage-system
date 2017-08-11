@@ -522,24 +522,6 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         query_path = self.get_related_query_path(model_name)
         return Q(**{query_path: self.main_object})
 
-    def get_initial(self):
-        """
-        : 在FormMixin中被定义, 在get_form_kwargs()中被调用
-        :return: 
-        """
-        if not self.is_related():
-            return super().get_initial()
-        initial = {}
-        query_path = self.get_related_query_path(self.current_entity_name)
-        try:
-            field_name, query_string = query_path.split('__', 1)
-        except ValueError:
-            initial[query_path] = self.main_object
-        # else:
-        #     field_related_model = self.model._meta.get_field(field_name).related_model
-        #     initial[field_name] = field_related_model._default_manager.filter(**{query_string: self.main_object})
-        return initial
-
     def get_form(self):
         """
         : 在FormMixin中被定义
@@ -562,11 +544,23 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
 
     def get_related_form(self):
         """
+        : 设置相关的初始值到self.object
         : 重写用于设置ModelChoiceField的queryset范围
         :return: 
         """
-        form = super().get_form()
+        # 强制在form实例化外生成self.object
+        # 并在self.object上设置相关初始值
+        # 弃用了在get_initial()中设置form的初始值
+        # 这是为了在子类重写__init__()方法的时候，能够统一使用form.instance
+        self.object = self.model()
         query_path = self.get_related_query_path(self.current_entity_name)
+        try:
+            field_name, query_string = query_path.split('__', 1)
+        except ValueError:
+            setattr(self.object, query_path, self.main_object)
+        form = super().get_form()
+
+        # 设置form相关field的queryset
         try:
             field_name, query_string = query_path.split('__', 1)
         except ValueError:

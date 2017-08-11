@@ -16,38 +16,73 @@ BASE_DIR = settings.BASE_DIR
 
 
 class Stage(FakerMixin, CommonFieldMixin):
-    name = models.CharField(max_length=100)
+    name = models.CharField('名称', max_length=100)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     data_path = os.path.join(BASE_DIR, 'data/case_stage.json')
 
+    class Meta:
+        verbose_name = '案件阶段'
+        verbose_name_plural = '案件阶段'
+
     def __str__(self):
-        return 'Case stage: {}'.format(self.name)
+        return '{}'.format(self.name)
 
 
 class Category(FakerMixin, CommonFieldMixin):
-    name = models.CharField(max_length=100)
+    name = models.CharField('名称', max_length=100)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
 
     data_path = os.path.join(BASE_DIR, 'data/case_category.json')
 
     class Meta:
-        verbose_name_plural = 'categories'
+        verbose_name = '案件分类'
+        verbose_name_plural = '案件分类'
 
     def __str__(self):
-        return 'Case category: {}'.format(self.name)
+        return '{}'.format(self.name)
 
 
 class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    name = models.CharField(max_length=200)
-    archive_no = models.CharField(max_length=100, null=True, blank=True)
-    settled = models.BooleanField(default=False)
-    closed = models.BooleanField(default=False)
+    name = models.CharField('案件名称', max_length=200)
+    archive_no = models.CharField('档案号', max_length=100, null=True, blank=True)
+    closed = models.BooleanField('结案', default=False)
 
-    client = models.ForeignKey('base.Client', on_delete=models.SET_NULL, null=True)
-    owner = models.ForeignKey('base.Owner', on_delete=models.SET_NULL, null=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
-    stage = models.ForeignKey(Stage, on_delete=models.SET_NULL, null=True)
-    entry_country = models.ForeignKey('base.Country', on_delete=models.SET_NULL, null=True)
+    client = models.ForeignKey(
+        'base.Client',
+        verbose_name='客户',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    owner = models.ForeignKey(
+        'base.Owner',
+        verbose_name='所属部门',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    category = models.ForeignKey(
+        Category,
+        verbose_name='案件分类',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    stage = models.ForeignKey(
+        Stage,
+        verbose_name='所处阶段',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    entry_country = models.ForeignKey(
+        'base.Country',
+        verbose_name='进入国家',
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
@@ -91,12 +126,19 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def get_detail_info(self):
         detail_info = {}
-        desc = {}
+        desc = OrderedDict()
         detail_info['title'] = self.name
-        detail_info['sub_title'] = self.client.name
+        detail_info['sub_title'] = self.archive_no
+
+        desc['客户'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.client_id}),
+            self.client.name
+        )
+        desc['结案'] = '是' if self.closed else '否'
         desc['进入国家'] = self.entry_country.name_chs
         desc['分类'] = self.category.name
-        desc['阶段'] = self.stage.name
+        desc['所属阶段'] = self.stage.name
+        desc['所属部门'] = self.owner.name
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
@@ -111,20 +153,25 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def balance_amount_cny(self):
         balance = sum(
             subcase.receipts_sum_cny + subcase.income_sum_cny
-            - (subcase.payment_sum_cny + subcase.expense_sum_cny)
-            for subcase in self.subcase_set.all()
+            - (subcase.payment_sum_cny + subcase.expense_sum_cny + subcase.paymentlink_sum_cny)
+            for subcase in self.subcase_set.filter(enabled=1).all()
         )
 
         return balance
 
 
 class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField(max_length=100)
-    name = models.CharField(max_length=300, null=True, blank=True)
-    applicant = models.CharField(max_length=300, null=True, blank=True)
-    app_date = models.DateField(null=True, blank=True)
+    no = models.CharField('申请编号', max_length=100)
+    name = models.CharField('申请名称', max_length=300, null=True, blank=True)
+    applicant = models.CharField('申请人', max_length=300, null=True, blank=True)
+    app_date = models.DateField('申请日期', null=True, blank=True)
 
-    case = models.OneToOneField(Case, on_delete=models.SET_NULL, null=True)
+    case = models.OneToOneField(
+        Case,
+        verbose_name='关联案件',
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     faker_fields = {
         'no': 'isbn13',
@@ -135,19 +182,24 @@ class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     }
 
     def __str__(self):
-        return 'Application: {}-{}'.format(self.no, self.name)
+        return '{}-{}'.format(self.name, self.no)
 
 
 class Contract(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField(max_length=100, null=True, blank=False)
-    contractor_name = models.CharField(max_length=100, null=True, blank=True)
-    contractor_tel = models.CharField(max_length=30, null=True, blank=True)
-    contractor_mobile = models.CharField(max_length=30, null=True, blank=True)
-    contractor_email = models.CharField(max_length=200, null=True, blank=True)
-    contractor_qq = models.CharField(max_length=45, null=True, blank=True)
-    signed_date = models.DateField(null=True, blank=True)
+    no = models.CharField('合同编号', max_length=100)
+    contractor_name = models.CharField('联系人姓名', max_length=100, null=True, blank=True)
+    contractor_tel = models.CharField('联系人电话', max_length=30, null=True, blank=True)
+    contractor_mobile = models.CharField('联系人手机', max_length=30, null=True, blank=True)
+    contractor_email = models.CharField('联系人Email', max_length=200, null=True, blank=True)
+    contractor_qq = models.CharField('联系人QQ', max_length=45, null=True, blank=True)
+    signed_date = models.DateField('签字日期', null=True, blank=True)
 
-    case = models.OneToOneField(Case, on_delete=models.SET_NULL, null=True)
+    case = models.OneToOneField(
+        Case,
+        verbose_name='关联合同',
+        on_delete=models.SET_NULL,
+        null=True
+    )
 
     faker_fields = {
         'no': 'isbn13',
@@ -161,12 +213,11 @@ class Contract(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     }
 
     def __str__(self):
-        return 'Contract: {}-{}'.format(self.no, self.case.name)
+        return '{}-{}'.format(self.no, self.contractor_name)
 
 
 class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField('分案名', max_length=200)
-    settled = models.BooleanField('款项结清', default=False)
     closed = models.BooleanField('结案', default=False)
 
     agent = models.ForeignKey(
@@ -235,12 +286,18 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
 
     def get_detail_info(self):
         detail_info = {}
-        desc = {}
+        desc = OrderedDict()
         detail_info['title'] = self.name
-        detail_info['sub_title'] = self.case.name
-        desc['代理'] = self.agent.name
-        desc['阶段'] = self.stage.name
-        desc['结清款项'] = self.settled
+        detail_info['sub_title'] = '<a href="{}">{}</a>'.format(
+            reverse('case:detail', kwargs={'case_id': self.case_id}),
+            self.case.name
+        )
+        desc['代理'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.agent_id}),
+            self.agent.name
+        )
+        desc['所处阶段'] = self.stage.name
+        desc['结案'] = '是' if self.closed else '否'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
@@ -270,7 +327,13 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def payment_sum_cny(self):
         # 所有关联payment的总金额
         # 包含transfer_charge
-        return sum(pm.amount_cny + pm.transfer_charge.amount for pm in self.payment_iter)
+        # 注意使用的是unlinked_amount_cny，表示当前payment未被转移的金额(CNY)
+        return sum(pm.unlinked_amount_cny + pm.transfer_charge.amount for pm in self.payment_iter)
+
+    @cached_property
+    def paymentlink_sum_cny(self):
+        # 注意要使用filter enabled=1
+        return sum(plink.amount_cny for plink in self.paymentlink_set.filter(enabled=1).all())
 
     @cached_property
     def income_sum_cny(self):
@@ -281,4 +344,3 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def expense_sum_cny(self):
         # 注意要使用filter enabled=1
         return sum(expense.amount_cny for expense in self.expense_set.filter(enabled=1).all())
-
