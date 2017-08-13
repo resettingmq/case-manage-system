@@ -231,7 +231,7 @@ class InfoboxMixin:
             if infobox_list is None:
                 return {}
         ret = []
-        for infobox_name in infobox_list:
+        for infobox_name, infobox_value in infobox_list.items():
             try:
                 # infobox_conf = site_config.INFO_BOXES[infobox_name]
                 model = apps.get_model(infobox_name)
@@ -244,7 +244,8 @@ class InfoboxMixin:
 
             extra_query_object = self.get_extra_query_object(model_name=infobox_name, model=model)
             count = model.enabled_objects.filter(extra_query_object).count()
-            ret.append((infobox_name, {'related_entity_name': infobox_name, 'count': count}))
+            t_name = infobox_value.get('t_name')
+            ret.append((infobox_name, {'related_entity_name': infobox_name, 'count': count, 't_name': t_name}))
 
         return OrderedDict(ret)
 
@@ -422,7 +423,7 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
             return True
         self.process_session()
         # 设置infobox相关属性
-        self.infobox_list = self.get_related_entity_config().keys()
+        self.infobox_list = self.get_related_entity_config()
         # 设置object_list，因为继承了MultipleObjectMixin，
         # 在它的get_context_data()中，读取了这个值
         # 这个情况比较诡异，虽然MultipleObjectMixin中可以根据关键字参数设置object_list
