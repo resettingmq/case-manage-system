@@ -8,7 +8,7 @@ from . import models, datatables
 # Create your views here.
 
 
-class IndexView(InfoboxMixin, generic.TemplateView):
+class IndexView(generic.TemplateView):
     template_name = 'base/index.html'
     view_name = 'index'
 
