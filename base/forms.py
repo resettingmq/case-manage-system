@@ -8,7 +8,7 @@ from . import models
 class ClientModelForm(forms.ModelForm):
     class Meta:
         model = models.Client
-        fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'state', 'city',
+        fields = ['name', 'is_agent', 'tel', 'mobile', 'fax', 'email', 'state', 'city',
                   'address', 'postal_code', 'currency', 'country', 'desc']
 
     def __init__(self, *args, **kwargs):

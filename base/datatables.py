@@ -8,7 +8,7 @@ from . import models
 class ClientDataTable(ModelDataTable):
     class Meta:
         model = models.Client
-        fields = ['name', 'is_agent', 'country__name_chs']
+        fields = ['name', 'is_agent', 'email', 'country__name_chs']
         titles = {
             'country__name_chs': '国家名',
         }

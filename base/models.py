@@ -213,6 +213,7 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     tel = models.CharField('电话', max_length=30, null=True, blank=True)
     mobile = models.CharField('移动电话', max_length=30, null=True, blank=True)
     fax = models.CharField('传真', max_length=30, null=True, blank=True)
+    email = models.EmailField('客户邮箱', max_length=255, null=True, blank=True)
     state = models.CharField('省/地区', max_length=100, null=True, blank=True)
     city = models.CharField('城市', max_length=100, null=True, blank=True)
     address = models.CharField('地址', max_length=200, null=True, blank=True)
@@ -292,6 +293,7 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         desc['电话'] = self.tel or '没有设置'
         desc['移动电话'] = self.mobile or '没有设置'
         desc['传真'] = self.fax or '没有设置'
+        desc['邮箱'] = self.email or '没有设置'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
