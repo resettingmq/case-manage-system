@@ -114,12 +114,15 @@ class ModelDataTableMetaClass(type):
         # todo: 实现从Fields中读取更多的配置信息，这里之实现了读取field_name
         meta_defined_columns = []
         field_names = getattr(meta, 'fields', [])
+        titles = getattr(meta, 'titles', {})
         for field_name in field_names:
             field = _get_field(model, field_name)
             if field is None:
                 continue
             dt_column = DataTablesColumn.get_instance_from_field(field)
             dt_column.name = field_name
+            if titles.get(field_name):
+                dt_column.title = titles.get(field_name)
             meta_defined_columns.append((field_name, dt_column))
         d['_meta_defined_columns'] = OrderedDict(meta_defined_columns)
 
