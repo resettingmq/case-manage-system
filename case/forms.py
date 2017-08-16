@@ -85,6 +85,8 @@ class CaseModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
 
         self.fields['client'].queryset = base_models.Client.enabled_objects
         self.fields['owner'].queryset = base_models.Owner.enabled_objects
-        self.fields['category'].queryset = models.Category.enabled_objects
+        # self.fields['category'].queryset = models.Category.enabled_objects
         self.fields['stage'].queryset = models.Stage.enabled_objects
         self.fields['entry_country'].queryset = base_models.Country.enabled_objects
+
+        self.fields['category'].choices = models.Category.get_choices()

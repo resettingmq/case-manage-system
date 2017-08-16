@@ -47,6 +47,15 @@ class Category(FakerMixin, CommonFieldMixin):
     def __str__(self):
         return '{}'.format(self.name)
 
+    @classmethod
+    def get_choices(cls):
+        choices = []
+        for c in cls.enabled_objects.all():
+            if c.parent is not None:
+                continue
+            choices.append((c.name, [(child_c.id, child_c.name) for child_c in c.category_set.all()]))
+        return choices
+
 
 class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField('案件名称', max_length=200)
