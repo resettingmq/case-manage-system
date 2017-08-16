@@ -81,6 +81,9 @@ class DataTablesMixin(JsonResponseMixin, JsonContextMixin):
         #     return dt_column_fields
         return self.dt_config.get_query_fields()
 
+    def process_http_queryset(self, queryset):
+        pass
+
     def get_json_context_data(self, http_queryset=None):
         """
         : 依赖于其他class的get_queryset()方法
