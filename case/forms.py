@@ -37,7 +37,8 @@ class ContractModelForm(forms.ModelForm):
 class SubCaseModelForm(forms.ModelForm):
     class Meta:
         model = models.SubCase
-        fields = ['name', 'closed', 'agent', 'case', 'stage', 'desc']
+        fields = ['name', 'closed', 'agent', 'case', 'entry_country',
+                  'category', 'stage', 'desc']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -46,6 +47,9 @@ class SubCaseModelForm(forms.ModelForm):
         self.fields['agent'].queryset = base_models.Client.enabled_objects.filter(is_agent=1)
         self.fields['case'].queryset = models.Case.enabled_objects
         self.fields['stage'].queryset = models.Stage.enabled_objects
+        self.fields['entry_country'].queryset = base_models.Country.enabled_objects
+
+        self.fields['category'].choices = models.Category.get_choices()
 
 
 class CaseModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
@@ -67,7 +71,7 @@ class CaseModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
     class Meta:
         model = models.Case
         fields = ['name', 'archive_no', 'closed', 'client', 'owner',
-                  'category', 'stage', 'entry_country', 'desc']
+                  'category', 'stage', 'desc']
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,6 +91,5 @@ class CaseModelForm(ModelFormFieldSupportMixin, forms.ModelForm):
         self.fields['owner'].queryset = base_models.Owner.enabled_objects
         # self.fields['category'].queryset = models.Category.enabled_objects
         self.fields['stage'].queryset = models.Stage.enabled_objects
-        self.fields['entry_country'].queryset = base_models.Country.enabled_objects
 
         self.fields['category'].choices = models.Category.get_choices()

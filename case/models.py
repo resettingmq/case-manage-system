@@ -76,7 +76,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     )
     category = models.ForeignKey(
         Category,
-        verbose_name='案件分类',
+        verbose_name='案件类型',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -86,9 +86,9 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         on_delete=models.SET_NULL,
         null=True
     )
-    entry_country = models.ForeignKey(
-        'base.Country',
-        verbose_name='进入国家',
+    trademark = models.ForeignKey(
+        'base.Trademark',
+        verbose_name='商标',
         on_delete=models.SET_NULL,
         null=True
     )
@@ -143,11 +143,10 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             reverse('client:detail', kwargs={'client_id': self.client_id}),
             self.client.name
         )
-        desc['结案'] = '是' if self.closed else '否'
-        desc['进入国家'] = self.entry_country.name_chs
-        desc['分类'] = self.category.name
+        desc['案件类型'] = self.category.name
         desc['所属阶段'] = self.stage.name
         desc['所属部门'] = self.owner.name
+        desc['结案'] = '是' if self.closed else '否'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
 
@@ -244,12 +243,24 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         null=True,
         blank=True
     )
+    category = models.ForeignKey(
+        Category,
+        verbose_name='案件类型',
+        on_delete=models.SET_NULL,
+        null=True
+    )
     stage = models.ForeignKey(
         Stage,
         verbose_name='所处阶段',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
+    )
+    entry_country = models.ForeignKey(
+        'base.Country',
+        verbose_name='进入国家',
+        on_delete=models.SET_NULL,
+        null=True
     )
 
     objects = models.Manager()
@@ -305,6 +316,8 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             reverse('client:detail', kwargs={'client_id': self.agent_id}),
             self.agent.name
         )
+        desc['进入国家'] = self.entry_country.name_chs
+        desc['案件类型'] = self.category.name
         desc['所处阶段'] = self.stage.name
         desc['结案'] = '是' if self.closed else '否'
         detail_info['desc'] = desc

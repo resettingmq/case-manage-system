@@ -10,16 +10,8 @@ from . import models, forms, datatables
 # Create your views here.
 
 
-class CaseDataTable(ModelDataTable):
-    class Meta:
-        model = models.Case
-        fields = ['name', 'client__name', 'archive_no', 'entry_country__name_chs',
-                  'category__name']
-        detail_url_format = '/case/{}'
-
-
 class CaseListView(DataTablesListView):
-    dt_config = CaseDataTable
+    dt_config = datatables.CaseDataTable
     model = models.Case
     template_name = 'case/case_list.html'
 
