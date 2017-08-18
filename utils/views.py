@@ -544,6 +544,16 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
                     field.disabled = True
             return form
 
+        # 强制在form实例化外生成self.object
+        # 并在self.object上设置相关初始值
+        # 弃用了在get_initial()中设置form的初始值
+        # 这是为了在子类重写__init__()方法的时候，能够统一使用form.instance
+        # 能够这样做是因为related-form只会是create form，对应的instance只能是新对象
+
+        # 从get_related_form()提前到get_form()方法中实例化model
+        # 这样就能够在子类重写get_related_form()时使用self.object，例如设置初始值
+        self.object = self.model()
+
         return self.get_related_form()
 
     def get_related_form(self):
@@ -552,11 +562,6 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         : 重写用于设置ModelChoiceField的queryset范围
         :return: 
         """
-        # 强制在form实例化外生成self.object
-        # 并在self.object上设置相关初始值
-        # 弃用了在get_initial()中设置form的初始值
-        # 这是为了在子类重写__init__()方法的时候，能够统一使用form.instance
-        self.object = self.model()
         query_path = self.get_related_query_path(self.current_entity_name)
         try:
             field_name, query_string = query_path.split('__', 1)
