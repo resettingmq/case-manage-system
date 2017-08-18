@@ -23,6 +23,14 @@ class CaseRelatedEntityView(RelatedEntityView):
     template_name = 'case/case_detail.html'
     main_entity_extra_action = ['show_balance']
 
+    def get_related_form(self):
+        # 使subcase create form中初始category/stage与对应的case相同
+        if self.current_entity_name == 'case.subcase':
+            self.object.category = self.main_object.category
+            self.object.stage = self.main_object.stage
+
+        return super().get_related_form()
+
 
 class CaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
     model = models.Case

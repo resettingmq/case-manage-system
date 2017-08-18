@@ -15,6 +15,6 @@ class CaseDataTable(ModelDataTable):
 class SubCaseDataTable(ModelDataTable):
     class Meta:
         model = models.SubCase
-        fields = ['name', 'settled', 'closed', 'agent__name', 'case__name', 'entry_country__name_chs',
+        fields = ['name', 'settled', 'closed', 'agent__name', 'case__name',
                   'category__name', 'stage__name']
         detail_url_format = '/subcase/{}'

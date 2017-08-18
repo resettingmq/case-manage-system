@@ -236,6 +236,36 @@
             <li><a href="{% url 'expense:create' %}"><i class="fa fa-plus-square-o"></i>添加其它支出</a></li>
           </ul>
         </li>
+
+        <li class="header">专利/商标相关</li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-trademark"></i>
+            <span>商标管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'trademark:list' %}"><i class="fa fa-list-ol"></i>商标列表</a></li>
+            <li><a href="{% url 'trademark:create' %}"><i class="fa fa-plus-square-o"></i>添加商标</a></li>
+            <li><a href="{% url 'trademarknation:list' %}"><i class="fa fa-list-ol"></i>商标-进入国家列表</a></li>
+            <li><a href="{% url 'trademarknation:create' %}"><i class="fa fa-plus-square-o"></i>添加商标-进入国家</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-lightbulb-o"></i>
+            <span>专利管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'expense:list' %}"><i class="fa fa-list-ol"></i>专利列表</a></li>
+            <li><a href="{% url 'expense:create' %}"><i class="fa fa-plus-square-o"></i>添加专利</a></li>
+          </ul>
+        </li>
       </ul>
     </section>
     <!-- /.sidebar -->
@@ -296,8 +326,8 @@
 <!-- Sparkline -->
 <script src="https://cdn.bootcss.com/jquery-sparklines/2.1.2/jquery.sparkline.min.js"></script>
 <!-- jvectormap -->
-<script src="https://cdn.bootcss.com/jvectormap/1.2.2/jquery-jvectormap.min.js"></script>
-<script src="{% static 'plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>
+{#<script src="https://cdn.bootcss.com/jvectormap/1.2.2/jquery-jvectormap.min.js"></script>#}
+{#<script src="{% static 'plugins/jvectormap/jquery-jvectormap-world-mill-en.js' %}"></script>#}
 <!-- SlimScroll 1.3.0 -->
 <script src="https://cdn.bootcss.com/slim-scroll/1.3.0/slimscroll.min.js"></script>
 <!-- ChartJS 1.0.1 -->
@@ -318,5 +348,9 @@
 <script src="{% static 'js/site.js' %}"></script>
 {% block javascript %}
 {% endblock javascript %}
+<!-- include form related javascript -->
+{% if form.js_file %}
+<script src="{% static form.js_file %}"></script>
+{% endif %}
 </body>
 </html>

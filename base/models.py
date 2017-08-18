@@ -247,6 +247,10 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             't_name': 'agent_case',
             'query_path': 'agent',
             'verbose_name': '代理分案信息'
+        },
+        'base.trademark': {
+            'query_path': 'client',
+            'verbose_name': '商标'
         }
     }
 
@@ -298,3 +302,183 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         detail_info['enabled'] = self.enabled
 
         return detail_info
+
+
+class Trademark(CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('商标名称', max_length=200)
+
+    client = models.ForeignKey(
+        Client,
+        verbose_name='所属客户',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'base.forms.TrademarkModelForm'
+    datatables_class = 'base.datatables.TrademarkDataTable'
+    related_entity_config = {
+        'base.trademarknation': {
+            'query_path': 'trademark',
+            'verbose_name': '商标-进入国家'
+        },
+        'case.case': {
+            'query_path': 'trademark',
+            'verbose_name': '案件',
+        },
+    }
+
+    class Meta:
+        verbose_name = '商标'
+        verbose_name_plural = '商标'
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('trademark:detail', kwargs={'trademark_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('trademark:disable', kwargs={'trademark_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('trademark:detail', kwargs={'trademark_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.client_id}),
+            self.client.name
+        )
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info
+
+
+class TrademarkNation(CommonFieldMixin, DescriptionFieldMixin):
+    app_no = models.CharField('申请号', max_length=20, null=True, blank=True)
+    app_date = models.DateField('申请日', null=True, blank=True)
+    applicant = models.CharField('申请人', max_length=100, null=True, blank=True)
+    register_no = models.CharField('注册号', max_length=20, null=True, blank=True)
+    register_date = models.DateField('注册日', null=True, blank=True)
+    state = models.CharField('商标状态', max_length=100, null=True, blank=True)
+
+    trademark = models.ForeignKey(
+        Trademark,
+        verbose_name='商标',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    country = models.ForeignKey(
+        Country,
+        verbose_name='申请国家',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'base.forms.TrademarkNationModelForm'
+    datatables_class = 'base.datatables.TrademarkNationDataTable'
+    related_entity_config = {
+        'case.subcase': {
+            'query_path': 'trademarknation',
+            'verbose_name': '分案',
+        },
+    }
+
+    class Meta:
+        verbose_name = '商标-进入国家'
+        verbose_name_plural = '商标-进入国家'
+
+    def __str__(self):
+        return '{}-{}'.format(self.trademark.name, self.country.name_chs)
+
+    def get_absolute_url(self):
+        return reverse('trademarknation:detail', kwargs={'trademarknation_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('trademarknation:disable', kwargs={'trademarknation_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('trademarknation:detail', kwargs={'trademarknation_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = '<a href="{}">{}</a>'.format(
+            reverse('trademark:detail', kwargs={'trademark_id': self.trademark_id}),
+            self.trademark.name
+        )
+        detail_info['sub_title'] = self.country.name_chs
+        desc['所属客户'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.trademark.client_id}),
+            self.trademark.client.name
+        )
+        desc['申请号'] = self.app_no or '未设置'
+        desc['申请日期'] = self.app_date or '未设置'
+        desc['申请人'] = self.applicant or '未设置'
+        desc['注册号'] = self.app_no or '未设置'
+        desc['注册日期'] = self.app_date or '未设置'
+        desc['状态'] = self.state or '未设置'
+
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info
+
+
+class NiceClassification(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('分类名称', max_length=10)
+
+    data_path = os.path.join(BASE_DIR, 'data/nice_classification.json')
+
+    class Meta:
+        verbose_name = '尼斯分类'
+        verbose_name_plural = '尼斯分类'
+
+    def __str__(self):
+        return self.name
+
+
+class TrademarkNationNice(CommonFieldMixin, DescriptionFieldMixin):
+    """
+    Association table for TrademarkNation to Nice many-to-many relationship
+    """
+    goods = models.CharField('商品/服务', max_length=400)
+
+    trademark_nation = models.ForeignKey(
+        TrademarkNation,
+        verbose_name='商标-国家',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    nice_class = models.ForeignKey(
+        NiceClassification,
+        verbose_name='尼斯分类',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    class Meta:
+        verbose_name = '商标分类'
+        verbose_name_plural = '商标分类'
+
+    def __str__(self):
+        return '{}-{}'.format(self.nice_class, self.trademark_nation)

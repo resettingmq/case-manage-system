@@ -90,7 +90,8 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'base.Trademark',
         verbose_name='商标',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
 
     objects = models.Manager()
@@ -114,12 +115,12 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'owner': Owner,
         'category': Category,
         'stage': Stage,
-        'entry_country': Country,
         'desc': 'paragraph'
     }
 
-    form_fields = ['name', 'archive_no', 'owner', 'closed', 'client',
-                   'category', 'stage', 'entry_country', 'desc']
+    class Meta:
+        verbose_name = '案件'
+        verbose_name_plural = '案件'
 
     def __str__(self):
         return 'Case: {}'.format(self.name)
@@ -168,62 +169,6 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         return balance
 
 
-class Application(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField('申请编号', max_length=100)
-    name = models.CharField('申请名称', max_length=300, null=True, blank=True)
-    applicant = models.CharField('申请人', max_length=300, null=True, blank=True)
-    app_date = models.DateField('申请日期', null=True, blank=True)
-
-    case = models.OneToOneField(
-        Case,
-        verbose_name='关联案件',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-
-    faker_fields = {
-        'no': 'isbn13',
-        'name': 'sentence',
-        'applicant': 'name',
-        'app_date': 'date',
-        'case': Case
-    }
-
-    def __str__(self):
-        return '{}-{}'.format(self.name, self.no)
-
-
-class Contract(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    no = models.CharField('合同编号', max_length=100)
-    contractor_name = models.CharField('联系人姓名', max_length=100, null=True, blank=True)
-    contractor_tel = models.CharField('联系人电话', max_length=30, null=True, blank=True)
-    contractor_mobile = models.CharField('联系人手机', max_length=30, null=True, blank=True)
-    contractor_email = models.CharField('联系人Email', max_length=200, null=True, blank=True)
-    contractor_qq = models.CharField('联系人QQ', max_length=45, null=True, blank=True)
-    signed_date = models.DateField('签字日期', null=True, blank=True)
-
-    case = models.OneToOneField(
-        Case,
-        verbose_name='关联合同',
-        on_delete=models.SET_NULL,
-        null=True
-    )
-
-    faker_fields = {
-        'no': 'isbn13',
-        'contractor_name': 'name',
-        'contractor_tel': 'phone_number',
-        'contractor_mobile': 'phone_number',
-        'contractor_email': 'email',
-        'contractor_qq': 'ean8',
-        'signed_date': 'date',
-        'case': Case
-    }
-
-    def __str__(self):
-        return '{}-{}'.format(self.no, self.contractor_name)
-
-
 class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     name = models.CharField('分案名', max_length=200)
     closed = models.BooleanField('结案', default=False)
@@ -256,11 +201,12 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         null=True,
         blank=True
     )
-    entry_country = models.ForeignKey(
-        'base.Country',
-        verbose_name='进入国家',
+    trademarknation = models.ForeignKey(
+        'base.TrademarkNation',
+        verbose_name='商标-进入国家',
         on_delete=models.SET_NULL,
-        null=True
+        null=True,
+        blank=True
     )
 
     objects = models.Manager()
@@ -286,6 +232,10 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             'verbose_name': '其它收入'
         },
     }
+
+    class Meta:
+        verbose_name = '分案'
+        verbose_name_plural = '分案'
 
     def __str__(self):
         return 'SubCase: {}'.format(self.name)
@@ -316,9 +266,13 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             reverse('client:detail', kwargs={'client_id': self.agent_id}),
             self.agent.name
         )
-        desc['进入国家'] = self.entry_country.name_chs
         desc['案件类型'] = self.category.name
         desc['所处阶段'] = self.stage.name
+        if self.trademarknation:
+            desc['商标(国家)'] = '<a href="{}">{}</a>'.format(
+                reverse('trademarknation:detail', kwargs={'trademarknation_id': self.trademarknation_id}),
+                self.trademarknation
+            )
         desc['结案'] = '是' if self.closed else '否'
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled
@@ -366,3 +320,34 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     def expense_sum_cny(self):
         # 注意要使用filter enabled=1
         return sum(expense.amount_cny for expense in self.expense_set.filter(enabled=1).all())
+
+
+class Contract(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
+    no = models.CharField('合同编号', max_length=100)
+    contractor_name = models.CharField('联系人姓名', max_length=100, null=True, blank=True)
+    contractor_tel = models.CharField('联系人电话', max_length=30, null=True, blank=True)
+    contractor_mobile = models.CharField('联系人手机', max_length=30, null=True, blank=True)
+    contractor_email = models.CharField('联系人Email', max_length=200, null=True, blank=True)
+    contractor_qq = models.CharField('联系人QQ', max_length=45, null=True, blank=True)
+    signed_date = models.DateField('签字日期', null=True, blank=True)
+
+    subcase = models.OneToOneField(
+        SubCase,
+        verbose_name='关联合同',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    faker_fields = {
+        'no': 'isbn13',
+        'contractor_name': 'name',
+        'contractor_tel': 'phone_number',
+        'contractor_mobile': 'phone_number',
+        'contractor_email': 'email',
+        'contractor_qq': 'ean8',
+        'signed_date': 'date',
+        'subcase': SubCase
+    }
+
+    def __str__(self):
+        return '{}-{}'.format(self.no, self.contractor_name)
