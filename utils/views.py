@@ -573,10 +573,14 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         try:
             field_name, query_string = query_path.split('__', 1)
         except ValueError:
-            form.fields[query_path].queryset = form.fields[query_path].queryset.filter(pk=self.main_object.pk)
+            field = form.fields.get(query_path)
+            if field is not None:
+                field.queryset = field.queryset.filter(pk=self.main_object.pk)
         else:
-            queryset = form.fields[field_name].queryset
-            form.fields[field_name].queryset = queryset.filter(**{query_string: self.main_object})
+            field = form.fields.get(field_name)
+            if field is not None:
+                queryset = field.queryset
+                field.queryset = queryset.filter(**{query_string: self.main_object})
         return form
 
     def get_detail_info_context(self):
