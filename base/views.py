@@ -136,3 +136,21 @@ class TrademarkNationDisableView(DisablementView):
                 '不能删除该商标：该商标具有关联的分案',
                 code='invalid'
             )
+
+    def disable(self):
+        # 首先将所有相关联的trademarknationnice disable
+        for tmnn in self.object.trademarknationnice_set.filter(enabled=True).all():
+            tmnn.enabled = False
+            tmnn.save()
+        super().disable()
+
+
+class TrademarkNationNiceRelatedEntityView(RelatedEntityView):
+    model = models.TrademarkNationNice
+    pk_url_kwarg = 'trademarknationnice_id'
+    template_name = 'trademarknationnice/trademarknationnice_detail.html'
+
+
+class TrademarkNationNiceDisableView(DisablementView):
+    model = models.TrademarkNationNice
+    pk_url_kwarg = 'trademarknationnice_id'

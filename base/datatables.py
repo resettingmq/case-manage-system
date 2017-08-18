@@ -32,3 +32,10 @@ class TrademarkNationDataTable(ModelDataTable):
             'country__name_chs': '国家名',
         }
         detail_url_format = '/trademark/nation/{}'
+
+
+class TrademarkNationNiceDataTable(ModelDataTable):
+    class Meta:
+        model = models.TrademarkNationNice
+        fields = ['nice_class__name', 'goods']
+        detail_url_format = '/trademark/nation/nice/{}'

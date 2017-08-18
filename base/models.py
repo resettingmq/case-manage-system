@@ -396,6 +396,10 @@ class TrademarkNation(CommonFieldMixin, DescriptionFieldMixin):
             'query_path': 'trademarknation',
             'verbose_name': '分案',
         },
+        'base.trademarknationnice': {
+            'query_path': 'trademarknation',
+            'verbose_name': '商品/服务分类信息'
+        }
     }
 
     class Meta:
@@ -461,9 +465,9 @@ class TrademarkNationNice(CommonFieldMixin, DescriptionFieldMixin):
     """
     Association table for TrademarkNation to Nice many-to-many relationship
     """
-    goods = models.CharField('商品/服务', max_length=400)
+    goods = models.TextField('商品/服务')
 
-    trademark_nation = models.ForeignKey(
+    trademarknation = models.ForeignKey(
         TrademarkNation,
         verbose_name='商标-国家',
         on_delete=models.SET_NULL,
@@ -476,9 +480,46 @@ class TrademarkNationNice(CommonFieldMixin, DescriptionFieldMixin):
         null=True
     )
 
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'base.forms.TrademarkNationNiceModelForm'
+    datatables_class = 'base.datatables.TrademarkNationNiceDataTable'
+    related_entity_config = {}
+
     class Meta:
-        verbose_name = '商标分类'
-        verbose_name_plural = '商标分类'
+        verbose_name = '分类商品/服务指定'
+        verbose_name_plural = '分类商品/服务指定'
 
     def __str__(self):
         return '{}-{}'.format(self.nice_class, self.trademark_nation)
+
+    def get_absolute_url(self):
+        return reverse('trademarknation:detail', kwargs={'trademarknation_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('trademarknation:disable', kwargs={'trademarknation_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('trademarknation:detail', kwargs={'trademarknation_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = self.nice_class
+        detail_info['sub_title'] = ''
+        desc['商标(国家)'] = '<a href="{}">{}</a>'.format(
+            reverse('trademarknation:detail', kwargs={'trademarknation_id': self.trademarknation_id}),
+            self.trademarknation.trademark.name
+        )
+        desc['国家'] = self.trademarknation.country.name_chs
+
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info

@@ -25,6 +25,19 @@ trademarknation_urlpatterns = [
     url(r'^disable/(?P<trademarknation_id>\d+)/$', views.TrademarkNationDisableView.as_view(), name='disable'),
 ]
 
+trademarknationnice_urlpatterns = [
+    url(
+        r'^(?P<trademarknationnice_id>\d+)/$',
+        views.TrademarkNationNiceRelatedEntityView.as_view(),
+        name='detail'
+    ),
+    url(
+        r'^disable/(?P<trademarknationnice_id>\d+)/$',
+        views.TrademarkNationNiceDisableView.as_view(),
+        name='disable'
+    ),
+]
+
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
@@ -32,4 +45,7 @@ urlpatterns = [
     url(r'^client/', include(client_urlpatterns, namespace='client')),
     url(r'^trademark/', include(trademark_urlpatterns, namespace='trademark')),
     url(r'^trademark/nation/', include(trademarknation_urlpatterns, namespace='trademarknation')),
+    url(r'^trademark/nation/nice/', include(
+        trademarknationnice_urlpatterns, namespace='trademarknationnice'
+    )),
 ]

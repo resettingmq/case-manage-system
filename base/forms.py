@@ -58,3 +58,11 @@ class TrademarkNationModelForm(forms.ModelForm):
         ).exists():
             raise ValidationError('该商标-进入国家已经存在')
         return cleaned_data
+
+
+class TrademarkNationNiceModelForm(forms.ModelForm):
+    class Meta:
+        model = models.TrademarkNationNice
+        # 注意，form中没有trademarknation field
+        # RelatedEntityView会自动把main_object关联到self.object上
+        fields = ['nice_class', 'goods']
