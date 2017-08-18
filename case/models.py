@@ -96,7 +96,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
 
-    datatables_class = 'case.views.CaseDataTable'
+    datatables_class = 'case.datatables.CaseDataTable'
     modelform_class = 'case.forms.CaseModelForm'
     related_entity_config = {
         'case.subcase': {
