@@ -620,16 +620,20 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
     def get_deletion_url(self):
         """
         : 用于获取delete_url
-        : 依赖于self.object
-        : 依赖于self.object.get_delete_url()
+        : 依赖于self.main_object
+        : 依赖于self.main_object.get_delete_url()
         : 返回值会被添加到context_data['delete_url']中
         :return: url or None
         """
+        if self.is_related():
+            # 当curr entity为related entity的时候
+            # 不显示delete按钮
+            return None
         if self.delete_url:
             url = self.delete_url.format(**self.object.__dict__)
         else:
             try:
-                url = self.object.get_deletion_url()
+                url = self.main_object.get_deletion_url()
             except AttributeError:
                 url = None
         return url
