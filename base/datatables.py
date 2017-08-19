@@ -39,3 +39,6 @@ class TrademarkNationNiceDataTable(ModelDataTable):
         model = models.TrademarkNationNice
         fields = ['nice_class__name', 'goods']
         detail_url_format = '/trademark/nation/nice/{}'
+        width = {
+            'nice_class__name': '60px',
+        }
