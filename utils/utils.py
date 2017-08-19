@@ -25,10 +25,11 @@ def _get_field(model, field_name):
 
 
 class DataTablesColumn:
-    def __init__(self, title=None, searchable=True, orderable=True, field=None):
+    def __init__(self, title=None, searchable=True, orderable=True, width=None, field=None):
         self.title = title
         self.searchable = searchable
         self.orderable = orderable
+        self.width = width
         if field is not None:
             self._initialize_from_field(field)
         else:
@@ -59,6 +60,8 @@ class DataTablesColumn:
         dt__column_config.update(data=self.name)
         dt__column_config.update(searchable=self.searchable)
         dt__column_config.update(orderable=self.orderable)
+        if self.width is not None:
+            dt__column_config.update(width=self.width)
         return dt__column_config
 
     def get_filter_q_object(self, pattern, is_regex):
@@ -175,6 +178,12 @@ class ModelDataTableMetaClass(type):
 
         # 生成table_id
         d['table_id'] = 'dt-{}'.format(model._meta.model_name)
+
+        # 处理Meta.width
+        width = getattr(meta, 'width', {})
+        for name, w in width.items():
+            if name in d['columns']:
+                d['columns'][name].width = w
 
         return super().__new__(mcls, name, bases, d)
 
