@@ -251,6 +251,10 @@ class Client(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         'base.trademark': {
             'query_path': 'client',
             'verbose_name': '商标'
+        },
+        'base.pattern': {
+            'query_path': 'client',
+            'verbose_name': '专利'
         }
     }
 
@@ -438,8 +442,8 @@ class TrademarkNation(CommonFieldMixin, DescriptionFieldMixin):
         desc['申请号'] = self.app_no or '未设置'
         desc['申请日期'] = self.app_date or '未设置'
         desc['申请人'] = self.applicant or '未设置'
-        desc['注册号'] = self.app_no or '未设置'
-        desc['注册日期'] = self.app_date or '未设置'
+        desc['注册号'] = self.register_no or '未设置'
+        desc['注册日期'] = self.register_date or '未设置'
         desc['状态'] = self.state or '未设置'
 
         detail_info['desc'] = desc
@@ -518,6 +522,154 @@ class TrademarkNationNice(CommonFieldMixin, DescriptionFieldMixin):
             self.trademarknation.trademark.name
         )
         desc['国家'] = self.trademarknation.country.name_chs
+
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info
+
+
+class Pattern(CommonFieldMixin, DescriptionFieldMixin):
+    name = models.CharField('专利名称', max_length=200)
+
+    client = models.ForeignKey(
+        Client,
+        verbose_name='所属客户',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'base.forms.PatternModelForm'
+    datatables_class = 'base.datatables.PatternDataTable'
+    related_entity_config = {
+        'base.patternnation': {
+            'query_path': 'pattern',
+            'verbose_name': '专利-进入国家',
+        },
+        'case.case': {
+            'query_path': 'pattern',
+            'verbose_name': '案件',
+        },
+    }
+
+    class Meta:
+        verbose_name = '专利'
+        verbose_name_plural = '专利'
+
+    def __str__(self):
+        return self.name
+
+    def get_absolute_url(self):
+        return reverse('pattern:detail', kwargs={'pattern_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('pattern:disable', kwargs={'pattern_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('pattern:detail', kwargs={'pattern_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = self.name
+        detail_info['sub_title'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.client_id}),
+            self.client.name
+        )
+        detail_info['desc'] = desc
+        detail_info['enabled'] = self.enabled
+
+        return detail_info
+
+
+class PatternNation(CommonFieldMixin, DescriptionFieldMixin):
+    app_no = models.CharField('申请号', max_length=20, null=True, blank=True)
+    app_date = models.DateField('申请日', null=True, blank=True)
+    publication_no = models.CharField('公开号', max_length=20, null=True, blank=True)
+    publication_date = models.DateField('公开日', null=True, blank=True)
+    publish_no = models.CharField('公布号', max_length=20, null=True, blank=True)
+    publish_date = models.DateField('公布日', null=True, blank=True)
+    pattern_no = models.CharField('专利号', max_length=20, null=True, blank=True)
+    granted_date = models.DateField('授权日', null=True, blank=True)
+    applicant = models.CharField('申请人', max_length=100, null=True, blank=True)
+    state = models.CharField('专利状态', max_length=100, null=True, blank=True)
+
+    pattern = models.ForeignKey(
+        Pattern,
+        verbose_name='专利',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+    country = models.ForeignKey(
+        Country,
+        verbose_name='申请国家',
+        on_delete=models.SET_NULL,
+        null=True
+    )
+
+    objects = models.Manager()
+    enabled_objects = EnabledEntityManager()
+
+    modelform_class = 'base.forms.PatternNationModelForm'
+    datatables_class = 'base.datatables.PatternNationDataTable'
+    related_entity_config = {
+        'case.subcase': {
+            'query_path': 'patternnation',
+            'verbose_name': '分案',
+        },
+    }
+
+    class Meta:
+        verbose_name = '专利-进入国家'
+        verbose_name_plural = '专利-进入国家'
+
+    def __str__(self):
+        return '{}-{}'.format(self.pattern.name, self.country.name_chs)
+
+    def get_absolute_url(self):
+        return reverse('patternnation:detail', kwargs={'patternnation_id': self.id})
+
+    def get_deletion_url(self):
+        return reverse('patternnation:disable', kwargs={'patternnation_id': self.id})
+
+    def get_deletion_success_url(self):
+        return reverse('patternnation:detail', kwargs={'patternnation_id': self.id})
+
+    @classmethod
+    def get_related_entity_config(cls):
+        if cls.related_entity_config is not None:
+            return cls.related_entity_config
+
+    def get_detail_info(self):
+        detail_info = {}
+        desc = OrderedDict()
+        detail_info['title'] = '<a href="{}">{}</a>'.format(
+            reverse('pattern:detail', kwargs={'pattern_id': self.pattern_id}),
+            self.pattern.name
+        )
+        detail_info['sub_title'] = self.country.name_chs
+        desc['所属客户'] = '<a href="{}">{}</a>'.format(
+            reverse('client:detail', kwargs={'client_id': self.pattern.client_id}),
+            self.pattern.client.name
+        )
+        desc['申请号'] = self.app_no or '未设置'
+        desc['申请日期'] = self.app_date or '未设置'
+        desc['申请人'] = self.applicant or '未设置'
+        desc['公开号'] = self.publication_no or '未设置'
+        desc['公开日期'] = self.publication_date or '未设置'
+        desc['公布号'] = self.publish_no or '未设置'
+        desc['公布日期'] = self.publish_date or '未设置'
+        desc['专利号'] = self.pattern_no or '未设置'
+        desc['授权日期'] = self.granted_date or '未设置'
+        desc['状态'] = self.state or '未设置'
 
         detail_info['desc'] = desc
         detail_info['enabled'] = self.enabled

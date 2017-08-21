@@ -3,7 +3,7 @@ from django.core.exceptions import ValidationError
 
 from utils.utils import ModelDataTable, DataTablesColumn
 from utils.views import DataTablesListView, ConfiguredModelFormMixin,\
-    RelatedEntityView, DisablementView
+    RelatedEntityView, DisablementView, FormMessageMixin
 
 from . import models, forms, datatables
 
@@ -24,15 +24,37 @@ class CaseRelatedEntityView(RelatedEntityView):
     main_entity_extra_action = ['show_balance']
 
     def get_related_form(self):
+
         # 使subcase create form中初始category/stage与对应的case相同
         if self.current_entity_name == 'case.subcase':
             self.object.category = self.main_object.category
             self.object.stage = self.main_object.stage
 
-        return super().get_related_form()
+            form = super().get_related_form()
+
+            if self.main_object.trademark is not None:
+                # 如果case关联的是trademark
+                form.fields['category'].choices = models.Category.get_choices(parent=1)
+                # 根据case限制可选的trademark nation(需要关联至同一个trademark)
+                form.fields['trademarknation'].queryset = \
+                    form.fields['trademarknation'].queryset.filter(
+                        trademark_id=self.main_object.trademark_id
+                    )
+            elif self.main_object.pattern is not None:
+                # 如果case关联的是pattern
+                form.fields['category'].choices = models.Category.get_choices(parent=2)
+                # 根据case限制可选的pattern nation(需要关联至同一个pattern)
+                form.fields['patternnation'].queryset = \
+                    form.fields['patternnation'].queryset.filter(
+                        pattern_id=self.main_object.pattern_id
+                    )
+        else:
+            form = super().get_related_form()
+
+        return form
 
 
-class CaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
+class CaseCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
     model = models.Case
     form_class = forms.CaseModelForm
     template_name = 'case/case_create.html'
@@ -73,7 +95,7 @@ class SubCaseRelatedEntityView(RelatedEntityView):
     template_name = 'case/subcase_detail.html'
 
 
-class SubCaseCreateView(ConfiguredModelFormMixin, generic.CreateView):
+class SubCaseCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
     model = models.SubCase
     template_name = 'case/subcase_create.html'
 

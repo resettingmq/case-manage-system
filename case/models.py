@@ -48,10 +48,19 @@ class Category(FakerMixin, CommonFieldMixin):
         return '{}'.format(self.name)
 
     @classmethod
-    def get_choices(cls):
+    def get_choices(cls, parent=None):
+        """
+        生成带有一级optgroup的HTML select options数据
+        :param parent: 用于筛选返回结果中的类别，支持list或者单个int值
+        :return: 
+        """
         choices = []
         for c in cls.enabled_objects.all():
             if c.parent is not None:
+                continue
+            if parent and (isinstance(parent, list) and c.id not in parent or c.id != parent):
+                # 筛选分类
+                # 在Trademark/Pattern relatedView中会调用
                 continue
             choices.append((c.name, [(child_c.id, child_c.name) for child_c in c.category_set.all()]))
         return choices
@@ -93,6 +102,13 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         null=True,
         blank=True
     )
+    pattern = models.ForeignKey(
+        'base.Pattern',
+        verbose_name='专利',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
@@ -123,7 +139,7 @@ class Case(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         verbose_name_plural = '案件'
 
     def __str__(self):
-        return 'Case: {}'.format(self.name)
+        return '{}:{}'.format(self.archive_no, self.name)
 
     def get_absolute_url(self):
         return reverse('case:detail', kwargs={'case_id': self.id})
@@ -179,14 +195,12 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         verbose_name='代理',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
     )
     case = models.ForeignKey(
         Case,
         verbose_name='所属案件',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
     )
     category = models.ForeignKey(
         Category,
@@ -199,11 +213,17 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         verbose_name='所处阶段',
         on_delete=models.SET_NULL,
         null=True,
-        blank=True
     )
     trademarknation = models.ForeignKey(
         'base.TrademarkNation',
         verbose_name='商标-进入国家',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True
+    )
+    patternnation = models.ForeignKey(
+        'base.PatternNation',
+        verbose_name='专利-进入国家',
         on_delete=models.SET_NULL,
         null=True,
         blank=True
@@ -238,7 +258,7 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
         verbose_name_plural = '分案'
 
     def __str__(self):
-        return 'SubCase: {}'.format(self.name)
+        return '分案: {}'.format(self.name)
 
     def get_absolute_url(self):
         return reverse('subcase:detail', kwargs={'subcase_id': self.id})
@@ -272,6 +292,11 @@ class SubCase(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
             desc['商标(国家)'] = '<a href="{}">{}</a>'.format(
                 reverse('trademarknation:detail', kwargs={'trademarknation_id': self.trademarknation_id}),
                 self.trademarknation
+            )
+        if self.patternnation:
+            desc['专利(国家)'] = '<a href="{}">{}</a>'.format(
+                reverse('patternnation:detail', kwargs={'patternnation_id': self.patternnation_id}),
+                self.patternnation
             )
         desc['结案'] = '是' if self.closed else '否'
         detail_info['desc'] = desc

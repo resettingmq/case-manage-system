@@ -3,7 +3,9 @@ from django.core.exceptions import ValidationError
 
 from utils.views import DataTablesListView, InfoboxMixin, ConfiguredModelFormMixin,\
     RelatedEntityView, DisablementView, FormMessageMixin
+
 from . import models, datatables
+from case import models as case_models
 
 # Create your views here.
 
@@ -69,12 +71,15 @@ class TrademarkRelatedEntityView(RelatedEntityView):
             form = super().get_related_form()
 
             # 将client的选择范围限制在当前trademark关联的client上
-            form.fields['client'].queryset = models.Client.objects.filter(
-                id=self.main_object.client_id
-            )
+            # 改为在_post_save()中根据trademark/pattern的client_id设置case.client_id
+            # form.fields['client'].queryset = models.Client.objects.filter(
+            #     id=self.main_object.client_id
+            # )
+
+            # 将category的选择范围限定在商标相关的category
+            form.fields['category'].choices = case_models.Category.get_choices(parent=1)
         else:
             form = super().get_related_form()
-
         return form
 
 
@@ -116,7 +121,12 @@ class TrademarkNationRelatedEntityView(RelatedEntityView):
         form = super().get_related_form()
 
         if self.current_entity_name == 'case.subcase':
+            # 在subcase create form中
+            # case的取值范围应该是trademarknation对应trademark的case_set
             form.fields['case'].queryset = self.main_object.trademark.case_set
+
+            # 将category范围限制在trademark相关category
+            form.fields['category'].choices = case_models.Category.get_choices(parent=1)
 
         return form
 
@@ -133,7 +143,7 @@ class TrademarkNationDisableView(DisablementView):
     def validate(self):
         if any(subcase.enabled for subcase in self.object.subcase_set.all()):
             raise ValidationError(
-                '不能删除该商标：该商标具有关联的分案',
+                '不能删除该商标-国家：该商标-国家具有关联的分案',
                 code='invalid'
             )
 
@@ -154,3 +164,99 @@ class TrademarkNationNiceRelatedEntityView(RelatedEntityView):
 class TrademarkNationNiceDisableView(DisablementView):
     model = models.TrademarkNationNice
     pk_url_kwarg = 'trademarknationnice_id'
+
+
+class PatternListView(DataTablesListView):
+    dt_config = datatables.PatternDataTable
+    model = models.Pattern
+    template_name = 'pattern/pattern_list.html'
+
+
+class PatternRelatedEntityView(RelatedEntityView):
+    model = models.Pattern
+    pk_url_kwarg = 'pattern_id'
+    template_name = 'pattern/pattern_detail.html'
+
+    def get_related_form(self):
+        if self.current_entity_name == 'case.case':
+            # 将client field的初始值设置为当前trademark关联的client
+            self.object.client = self.main_object.client
+
+            form = super().get_related_form()
+
+            # 将client的选择范围限制在当前trademark关联的client上
+            # 改为在_post_save()中根据trademark/pattern的client_id设置case.client_id
+            # form.fields['client'].queryset = models.Client.objects.filter(
+            #     id=self.main_object.client_id
+            # )
+
+            # 将category的选择范围限定在专利相关的category
+            form.fields['category'].choices = case_models.Category.get_choices(parent=2)
+        else:
+            form = super().get_related_form()
+
+        return form
+
+
+class PatternCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
+    model = models.Pattern
+    template_name = 'pattern/pattern_create.html'
+
+
+class PatternDisableView(DisablementView):
+    model = models.Pattern
+    pk_url_kwarg = 'pattern_id'
+
+    def validate(self):
+        if any(case.enabled for case in self.object.case_set.all()):
+            raise ValidationError(
+                '不能删除该专利：该专利具有关联的案件',
+                code='invalid'
+            )
+
+        if any(pn.enabled for pn in self.object.patternnation_set.all()):
+            raise ValidationError(
+                '不能删除该专利：该商标具有关联的专利国家注册',
+                code='invalid'
+            )
+
+
+class PatternNationListView(DataTablesListView):
+    dt_config = datatables.PatternNationDataTable
+    model = models.PatternNation
+    template_name = 'patternnation/patternnation_list.html'
+
+
+class PatternNationRelatedEntityView(RelatedEntityView):
+    model = models.PatternNation
+    pk_url_kwarg = 'patternnation_id'
+    template_name = 'patternnation/patternnation_detail.html'
+
+    def get_related_form(self):
+        form = super().get_related_form()
+
+        if self.current_entity_name == 'case.subcase':
+            # 在subcase create form中
+            # case的取值范围应该是patternnation对应pattern的case_set
+            form.fields['case'].queryset = self.main_object.pattern.case_set
+            # 将category范围限制在pattern相关category
+            form.fields['category'].choices = case_models.Category.get_choices(parent=2)
+
+        return form
+
+
+class PatternNationCreateView(FormMessageMixin, ConfiguredModelFormMixin, generic.CreateView):
+    model = models.PatternNation
+    template_name = 'patternnation/patternnation_create.html'
+
+
+class PatternNationDisableView(DisablementView):
+    model = models.PatternNation
+    pk_url_kwarg = 'patternnation_id'
+
+    def validate(self):
+        if any(subcase.enabled for subcase in self.object.subcase_set.all()):
+            raise ValidationError(
+                '不能删除该专利-国家：该专利-国家具有关联的分案',
+                code='invalid'
+            )

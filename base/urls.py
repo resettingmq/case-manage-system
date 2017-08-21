@@ -38,6 +38,20 @@ trademarknationnice_urlpatterns = [
     ),
 ]
 
+pattern_urlpatterns = [
+    url(r'^$', views.PatternListView.as_view(), name='list'),
+    url(r'^(?P<pattern_id>\d+)/$', views.PatternRelatedEntityView.as_view(), name='detail'),
+    url(r'^create/$', views.PatternCreateView.as_view(), name='create'),
+    url(r'^disable/(?P<pattern_id>\d+)/$', views.PatternDisableView.as_view(), name='disable'),
+]
+
+patternnation_urlpatterns = [
+    url(r'^$', views.PatternNationListView.as_view(), name='list'),
+    url(r'^(?P<patternnation_id>\d+)/$', views.PatternNationRelatedEntityView.as_view(), name='detail'),
+    url(r'^create/$', views.PatternNationCreateView.as_view(), name='create'),
+    url(r'^disable/(?P<patternnation_id>\d+)/$', views.PatternNationDisableView.as_view(), name='disable'),
+]
+
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^login/$', auth_views.LoginView.as_view(), name='login'),
@@ -48,4 +62,6 @@ urlpatterns = [
     url(r'^trademark/nation/nice/', include(
         trademarknationnice_urlpatterns, namespace='trademarknationnice'
     )),
+    url(r'^pattern/', include(pattern_urlpatterns, namespace='pattern')),
+    url(r'^pattern/nation/', include(patternnation_urlpatterns, namespace='patternnation'))
 ]

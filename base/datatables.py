@@ -42,3 +42,22 @@ class TrademarkNationNiceDataTable(ModelDataTable):
         width = {
             'nice_class__name': '60px',
         }
+
+
+class PatternDataTable(ModelDataTable):
+    class Meta:
+        model = models.Pattern
+        fields = ['name', 'client__name']
+        detail_url_format = '/pattern/{}'
+
+
+class PatternNationDataTable(ModelDataTable):
+    class Meta:
+        model = models.PatternNation
+        fields = ['app_no', 'publication_no', 'publish_no', 'pattern_no',
+                  'pattern__name', 'pattern__client__name',
+                  'country__name_chs', 'state']
+        titles = {
+            'country__name_chs': '国家名',
+        }
+        detail_url_format = '/pattern/nation/{}'
