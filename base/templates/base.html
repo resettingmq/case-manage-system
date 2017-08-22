@@ -153,10 +153,66 @@
           </ul>
         </li>
 
+        <li class="header">商标相关</li>
+        <li class="treeview">
+          <a href="#">
+            <i class="fa fa-trademark"></i>
+            <span>商标管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'trademark:list' %}"><i class="fa fa-list-ol"></i>商标列表</a></li>
+            <li><a href="{% url 'trademark:create' %}"><i class="fa fa-plus-square-o"></i>添加商标</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="ion ion-earth"></i>
+            <span>进入国家</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'trademarknation:list' %}"><i class="fa fa-list-ol"></i>商标-进入国家列表</a></li>
+            <li><a href="{% url 'trademarknation:create' %}"><i class="fa fa-plus-square-o"></i>添加商标-进入国家</a></li>
+          </ul>
+        </li>
+
+        <li class="header">专利相关</li>
+        <li class="treeview">
+          <a href="#">
+            <i class="ion ion-android-bulb"></i>
+            <span>专利管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'pattern:list' %}"><i class="fa fa-list-ol"></i>专利列表</a></li>
+            <li><a href="{% url 'pattern:create' %}"><i class="fa fa-plus-square-o"></i>添加专利</a></li>
+          </ul>
+        </li>
+        <li class="treeview">
+          <a href="#">
+            <i class="ion ion-ios-world-outline"></i>
+            <span>进入国家</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="{% url 'patternnation:list' %}"><i class="fa fa-list-ol"></i>专利-进入国家列表</a></li>
+            <li><a href="{% url 'patternnation:create' %}"><i class="fa fa-plus-square-o"></i>专利-进入国家列表</a></li>
+          </ul>
+        </li>
+
         <li class="header">收款相关</li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-newspaper-o"></i>
+            <i class="fa fa-jpy"></i>
             <span>待收款项管理</span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
@@ -184,15 +240,15 @@
         <li class="header">付款相关</li>
         <li class="treeview">
           <a href="#">
-            <i class="fa fa-files-o"></i>
-            <span>应付款项管理</span>
+            <i class="fa fa-usd"></i>
+            <span>待付款项管理</span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
             </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="{% url 'payable:list' %}"><i class="fa fa-list-ol"></i>应付款项列表</a></li>
-            <li><a href="{% url 'payable:create' %}"><i class="fa fa-plus-square-o"></i>添加应付款项</a></li>
+            <li><a href="{% url 'payable:list' %}"><i class="fa fa-list-ol"></i>待付款项列表</a></li>
+            <li><a href="{% url 'payable:create' %}"><i class="fa fa-plus-square-o"></i>添加待付款项</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -234,38 +290,6 @@
           <ul class="treeview-menu">
             <li><a href="{% url 'expense:list' %}"><i class="fa fa-list-ol"></i>其它支出列表</a></li>
             <li><a href="{% url 'expense:create' %}"><i class="fa fa-plus-square-o"></i>添加其它支出</a></li>
-          </ul>
-        </li>
-
-        <li class="header">专利/商标相关</li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-trademark"></i>
-            <span>商标管理</span>
-            <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{% url 'trademark:list' %}"><i class="fa fa-list-ol"></i>商标列表</a></li>
-            <li><a href="{% url 'trademark:create' %}"><i class="fa fa-plus-square-o"></i>添加商标</a></li>
-            <li><a href="{% url 'trademarknation:list' %}"><i class="fa fa-list-ol"></i>商标-进入国家列表</a></li>
-            <li><a href="{% url 'trademarknation:create' %}"><i class="fa fa-plus-square-o"></i>添加商标-进入国家</a></li>
-          </ul>
-        </li>
-        <li class="treeview">
-          <a href="#">
-            <i class="fa fa-lightbulb-o"></i>
-            <span>专利管理</span>
-            <span class="pull-right-container">
-                <i class="fa fa-angle-left pull-right"></i>
-            </span>
-          </a>
-          <ul class="treeview-menu">
-            <li><a href="{% url 'pattern:list' %}"><i class="fa fa-list-ol"></i>专利列表</a></li>
-            <li><a href="{% url 'pattern:create' %}"><i class="fa fa-plus-square-o"></i>添加专利</a></li>
-            <li><a href="{% url 'patternnation:list' %}"><i class="fa fa-list-ol"></i>专利-进入国家列表</a></li>
-            <li><a href="{% url 'patternnation:create' %}"><i class="fa fa-plus-square-o"></i>专利-进入国家列表</a></li>
           </ul>
         </li>
       </ul>
