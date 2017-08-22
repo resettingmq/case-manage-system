@@ -16,7 +16,7 @@ BASE_DIR = settings.BASE_DIR
 
 
 class Stage(FakerMixin, CommonFieldMixin):
-    name = models.CharField('名称', max_length=100)
+    name = models.CharField('阶段', max_length=100)
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
@@ -32,7 +32,7 @@ class Stage(FakerMixin, CommonFieldMixin):
 
 
 class Category(FakerMixin, CommonFieldMixin):
-    name = models.CharField('名称', max_length=100)
+    name = models.CharField('类别', max_length=100)
     parent = models.ForeignKey('self', on_delete=models.CASCADE, null=True, blank=True)
 
     objects = models.Manager()
