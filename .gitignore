@@ -5,5 +5,4 @@ venv/
 .sock
 .vscode/
 etc/
-
-/data/
+data/
