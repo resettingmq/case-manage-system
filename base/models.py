@@ -148,8 +148,8 @@ class Continent(FakerMixin, CommonFieldMixin):
 
 class Country(FakerMixin, CommonFieldMixin):
     id = models.CharField(max_length=2, primary_key=True)
-    name_chs = models.CharField('中文名', max_length=50, null=True, blank=True)
-    name_en_short = models.CharField(max_length=50)
+    name_chs = models.CharField('国家', max_length=50, null=True, blank=True)
+    name_en_short = models.CharField('国家(en)', max_length=50)
     name_en_long = models.CharField(max_length=100, null=True, blank=True)
     calling_code = models.CharField(max_length=50)
     iso_code = models.CharField(max_length=5)
@@ -174,9 +174,9 @@ class Country(FakerMixin, CommonFieldMixin):
 
 class Currency(FakerMixin, CommonFieldMixin):
     id = models.CharField(max_length=5, primary_key=True)
-    name_chs = models.CharField(max_length=50)
-    name_en = models.CharField(max_length=50)
-    symbol = models.CharField(max_length=5, null=True, blank=True)
+    name_chs = models.CharField('货币', max_length=50)
+    name_en = models.CharField('货币(en)', max_length=50)
+    symbol = models.CharField('货币符号', max_length=5, null=True, blank=True)
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
@@ -192,7 +192,7 @@ class Currency(FakerMixin, CommonFieldMixin):
 
 
 class Owner(FakerMixin, CommonFieldMixin, DescriptionFieldMixin):
-    name = models.CharField('名称', max_length=100)
+    name = models.CharField('部门', max_length=100)
 
     objects = models.Manager()
     enabled_objects = EnabledEntityManager()
