@@ -205,6 +205,10 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
     dt_rowId = 'pk'
     dt_serverSide = True
     dt_processing = True
+    # serverSide为True的情况下，
+    # dt_ajax为None(ajax: null)的情况下，是对当前url发出ajax请求
+    # serverSide为False的情况下，
+    # 需要将dt_ajax设置为'.'或'./'来实现对当前url发出ajax请求
     # 这个设置是必须的，否则很多情况下会报错（Cannot set property 'data' of null）
     dt_ajax = './'
     # 设置datatables buttons
@@ -237,7 +241,6 @@ class ModelDataTable(metaclass=ModelDataTableMetaClass):
         :return: list，每个元素代表一个column的配置
         """
         return [c.get_dt_column_config() for c in cls.columns.values()]
-
 
     @classmethod
     def get_dt_config(cls):
