@@ -25,11 +25,11 @@ class TrademarkDataTable(ModelDataTable):
 class TrademarkNationDataTable(ModelDataTable):
     class Meta:
         model = models.TrademarkNation
-        fields = ['app_no', 'app_date', 'register_no', 'register_date',
-                  'trademark__name', 'trademark__client__name',
-                  'country__name_chs', 'state']
+        fields = ['trademark__name', 'country__name_chs',
+                  'app_no', 'app_date', 'register_no', 'register_date',
+                  'trademark__client__name', 'state']
         titles = {
-            'country__name_chs': '国家名',
+            'country__name_chs': '进入国家',
         }
         detail_url_format = '/trademark/nation/{}'
 
@@ -54,10 +54,10 @@ class PatternDataTable(ModelDataTable):
 class PatternNationDataTable(ModelDataTable):
     class Meta:
         model = models.PatternNation
-        fields = ['app_no', 'publication_no', 'publish_no', 'pattern_no',
-                  'pattern__name', 'pattern__client__name',
-                  'country__name_chs', 'state']
+        fields = ['pattern__name', 'country__name_chs',
+                  'app_no', 'publication_no', 'publish_no', 'pattern_no',
+                  'pattern__client__name', 'state']
         titles = {
-            'country__name_chs': '国家名',
+            'country__name_chs': '进入国家',
         }
         detail_url_format = '/pattern/nation/{}'
