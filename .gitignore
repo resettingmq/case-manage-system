@@ -2,7 +2,9 @@
 __pycache__/
 *.py[cod]
 venv/
-.sock
+*.sock
 .vscode/
 /etc/
 /data/
+/static/
+/cms/virmach_settings.py
