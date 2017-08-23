@@ -12,7 +12,7 @@
   content: "\f373";
 }
 
-.table-dt tbody tr{
+.table-dt tbody tr {
   cursor: pointer;
 }
 
@@ -20,4 +20,23 @@
   padding: 6px 6px;
   font-size: 14px;
   background-color: #e6e6e6;
+}
+
+.info-box-index a {
+  color: #fff;
+}
+
+.info-box-index .info-box-content {
+  padding: 10px;
+}
+
+.info-box-index .info-box-text {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.info-box-index .info-box-number {
+  font-size: 25px;
+  font-weight: bold;
+  padding-left: 15px;
 }

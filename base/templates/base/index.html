@@ -12,11 +12,22 @@
 
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-yellow">
-                <span class="info-box-icon"><i class="fa fa-user-circle"></i></span>
+            <div class="info-box bg-yellow info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'client:create' %}" data-toggle="tooltip" title="添加客户/代理">
+                        <i class="fa fa-user-circle"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">客户/代理</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'client:list' %}" data-toggle="tooltip" title="客户/代理列表">
+                            {{ info.client.count }}
+                        </a>
+                    </span>
+                    <div class="progress">
+                        <div class="progress-bar" style="width: 70%"></div>
+                    </div>
                     <span class="progress-description">
                     </span>
                 </div><!-- /.info-box-content -->
@@ -24,32 +35,46 @@
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12 col-md-offset-3">
-            <div class="info-box bg-orange-active">
-                <span class="info-box-icon"><i class="ion ion-ios-paper-outline"></i></span>
+            <div class="info-box bg-orange-active info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'case:create' %}" data-toggle="tooltip" title="添加案件">
+                        <i class="ion ion-ios-paper-outline"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">案件</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'case:list' %}" data-toggle="tooltip" title="案件列表">
+                            {{ info.case.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-orange-active">
-                <span class="info-box-icon"><i class="fa fa-file-text-o"></i></span>
+            <div class="info-box bg-orange-active info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'case:create' %}" data-toggle="tooltip" title="添加分案">
+                        <i class="fa fa-file-text-o"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">分案</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'subcase:list' %}" data-toggle="tooltip" title="分案列表">
+                            {{ info.subcase.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
@@ -58,64 +83,92 @@
 
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-blue">
-                <span class="info-box-icon"><i class="fa fa-trademark"></i></span>
+            <div class="info-box bg-blue info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'trademark:create' %}" data-toggle="tooltip" title="添加商标">
+                        <i class="fa fa-trademark"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">商标</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'trademark:list' %}" data-toggle="tooltip" title="商标列表">
+                            {{ info.trademark.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-blue">
-                <span class="info-box-icon"><i class="ion ion-earth"></i></span>
+            <div class="info-box bg-blue info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'trademarknation:create' %}" data-toggle="tooltip" title="添加商标-进入国家">
+                        <i class="ion ion-earth"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">商标-进入国家</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'trademarknation:list' %}" data-toggle="tooltip" title="商标-进入国家列表">
+                            {{ info.trademarknation.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-aqua">
-                <span class="info-box-icon"><i class="ion ion-android-bulb"></i></span>
+            <div class="info-box bg-aqua info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'pattern:create' %}" data-toggle="tooltip" title="添加专利">
+                        <i class="ion ion-android-bulb"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">专利</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'pattern:list' %}" data-toggle="tooltip" title="专利列表">
+                            {{ info.pattern.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-aqua">
-                <span class="info-box-icon"><i class="ion ion-ios-world-outline"></i></span>
+            <div class="info-box bg-aqua info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'patternnation:create' %}" data-toggle="tooltip" title="添加专利-进入国家">
+                        <i class="ion ion-ios-world-outline"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">专利-进入国家</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'patternnation:list' %}" data-toggle="tooltip" title="专利-进入国家列表">
+                            {{ info.patternnation.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
@@ -124,64 +177,92 @@
 
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="fa fa-jpy"></i></span>
+            <div class="info-box bg-red info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'receivable:create' %}" data-toggle="tooltip" title="添加待收款项">
+                        <i class="fa fa-jpy"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">待收款项</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'receivable:list' %}" data-toggle="tooltip" title="待收款项列表">
+                            {{ info.receivable.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="fa fa-money"></i></span>
+            <div class="info-box bg-red info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'receipts:create' %}" data-toggle="tooltip" title="添加已收款项">
+                        <i class="fa fa-money"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">已收款项</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'receipts:list' %}" data-toggle="tooltip" title="已收款项列表">
+                            {{ info.receipts.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="fa fa-usd"></i></span>
+            <div class="info-box bg-green info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'payable:create' %}" data-toggle="tooltip" title="添加待付款项">
+                        <i class="fa fa-usd"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">待付款项</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'payable:list' %}" data-toggle="tooltip" title="待付款项列表">
+                            {{ info.payable.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="fa fa-credit-card-alt"></i></span>
+            <div class="info-box bg-green info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'payment:create' %}" data-toggle="tooltip" title="添加已付款项">
+                        <i class="fa fa-credit-card-alt"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">已付款项</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'payment:list' %}" data-toggle="tooltip" title="已付款项列表">
+                            {{ info.payment.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
@@ -190,32 +271,46 @@
 
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box bg-red">
-                <span class="info-box-icon"><i class="ion ion-arrow-up-a"></i></span>
+            <div class="info-box bg-red info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'income:create' %}" data-toggle="tooltip" title="添加其它收入">
+                        <i class="ion ion-arrow-up-a"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">其它收入</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'income:list' %}" data-toggle="tooltip" title="其它收入列表">
+                            {{ info.income.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->
         </div>
 
         <div class="col-md-3 col-sm-6 col-xs-12 col-md-offset-3">
-            <div class="info-box bg-green">
-                <span class="info-box-icon"><i class="ion ion-arrow-down-a"></i></span>
+            <div class="info-box bg-green info-box-index">
+                <span class="info-box-icon">
+                    <a href="{% url 'expense:create' %}" data-toggle="tooltip" title="添加其它支出">
+                        <i class="ion ion-arrow-down-a"></i>
+                    </a>
+                </span>
                 <div class="info-box-content">
                     <span class="info-box-text">其它支出</span>
-                    <span class="info-box-number">41,410</span>
+                    <span class="info-box-number">
+                        <a href="{% url 'expense:list' %}" data-toggle="tooltip" title="其它支出列表">
+                            {{ info.expense.count }}
+                        </a>
+                    </span>
                     <div class="progress">
                         <div class="progress-bar" style="width: 70%"></div>
                     </div>
                     <span class="progress-description">
-                        70% Increase in 30 Days
                     </span>
                 </div><!-- /.info-box-content -->
             </div><!-- /.info-box -->

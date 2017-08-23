@@ -1,5 +1,6 @@
 from django.views import generic
 from django.core.exceptions import ValidationError
+from django.apps import apps
 
 from utils.views import DataTablesListView, InfoboxMixin, ConfiguredModelFormMixin,\
     RelatedEntityView, DisablementView, FormMessageMixin
@@ -12,7 +13,25 @@ from case import models as case_models
 
 class IndexView(generic.TemplateView):
     template_name = 'base/index.html'
-    view_name = 'index'
+    # view_name = 'index'
+    infobox_list = ['base.client', 'case.case', 'case.subcase',
+                    'base.trademark', 'base.trademarknation',
+                    'base.pattern', 'base.patternnation',
+                    'sale.receivable', 'sale.receipts',
+                    'purchase.payable', 'purchase.payment',
+                    'income.income', 'expense.expense']
+
+    def get_context_data(self, **kwargs):
+        info = dict()
+        for entity_name in self.infobox_list:
+            model = apps.get_model(entity_name)
+            model_name = model._meta.model_name
+            info[model_name] = dict()
+            info[model_name]['count'] = model.enabled_objects.count()
+
+        kwargs.update(info=info)
+
+        return super().get_context_data(**kwargs)
 
 
 class ClientListView(DataTablesListView):
