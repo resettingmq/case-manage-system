@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-user-circle"></i> 客户管理</li>
+    <li><i class="fa fa-list-ol"></i> 客户列表</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
 客户列表
 {% endblock content-title %}

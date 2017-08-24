@@ -4,6 +4,12 @@
 {% load formfield_widget %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-money"></i> 已收款项管理</li>
+    <li> 已收款项详情</li>
+    <li> {{ main_object }}</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
     已收款项详情<small>{{ object.name }}</small>
 {% endblock content-title %}

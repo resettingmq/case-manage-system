@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="ion ion-ios-paper-outline"></i> 案件管理</li>
+    <li><i class="fa fa-list-ol"></i> 案件列表</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
 案件列表
 {% endblock content-title %}

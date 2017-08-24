@@ -1,8 +1,13 @@
 {% extends 'base.html' %}
 {% load cms_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-usd"></i> 待付款项管理</li>
+    <li><i class="fa fa-plus-square-o"></i> 添加待付款项</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
-    新增待付款项
+    添加待付款项
 {% endblock content-title %}
 
 {% block content %}

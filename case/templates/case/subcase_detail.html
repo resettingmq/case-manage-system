@@ -4,6 +4,12 @@
 {% load formfield_widget %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-file-text-o"></i> 分案管理</li>
+    <li> 分案详情</li>
+    <li> {{ main_object }}</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
     分案详情<small>{{ object.name }}</small>
 {% endblock content-title %}

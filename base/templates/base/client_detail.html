@@ -3,8 +3,14 @@
 {% load cms_widget %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-user-circle"></i> 客户管理</li>
+    <li> 客户详情</li>
+    <li> {{ main_object }}</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
-    客户详情<small>{{ client.name }}</small>
+    客户详情
 {% endblock content-title %}
 
 {% block content_tab %}

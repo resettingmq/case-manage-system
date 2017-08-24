@@ -2,8 +2,13 @@
 {% load widget_tweaks %}
 {% load cms_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-user-circle"></i> 客户管理</li>
+    <li><i class="ion ion-person-add"></i> 添加客户</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
-    新增客户
+    添加客户
 {% endblock content-title %}
 
 {% block content %}

@@ -4,6 +4,12 @@
 {% load formfield_widget %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="ion ion-arrow-up-a"></i> 其它收入管理</li>
+    <li> 其它收入详情</li>
+    <li> {{ main_object }}</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
     其它支出详情<small>{{ object.name }}</small>
 {% endblock content-title %}

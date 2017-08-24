@@ -4,6 +4,12 @@
 {% load formfield_widget %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="fa fa-trademark"></i> 商标管理</li>
+    <li> 商标详情</li>
+    <li> {{ main_object }}</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
     商标详情<small>{{ object.name }}</small>
 {% endblock content-title %}

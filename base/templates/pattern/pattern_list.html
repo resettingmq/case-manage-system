@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 {% load datatables_widget %}
 
+{% block breadcrumb %}
+    <li><i class="ion ion-android-bulb"></i> 专利管理</li>
+    <li><i class="fa fa-list-ol"></i> 专利列表</li>
+{% endblock breadcrumb %}
+
 {% block content-title %}
 专利列表
 {% endblock content-title %}

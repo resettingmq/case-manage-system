@@ -624,6 +624,7 @@ class RelatedEntityConstructMixin(ConfiguredModelFormMixin, InfoboxMixin, ModelD
         kwargs['detail_info'] = self.get_detail_info_context()
         kwargs['related_data'] = self.get_related_data_context()
         kwargs['deletion_url'] = self.get_deletion_url()
+        kwargs['main_object'] = self.main_object
         return super().get_context_data(**kwargs)
 
     def get_deletion_url(self):
